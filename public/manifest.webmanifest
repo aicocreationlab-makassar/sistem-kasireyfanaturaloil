@@ -1,0 +1,9 @@
+{
+  "name": "EYFA Natural Oil POS",
+  "short_name": "EYFA POS",
+  "start_url": "/cashier",
+  "display": "standalone",
+  "background_color": "#f6f3eb",
+  "theme_color": "#285b3a",
+  "icons": [{ "src": "/logo-eyfa.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }]
+}
