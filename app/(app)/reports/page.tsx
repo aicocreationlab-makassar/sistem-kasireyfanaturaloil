@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Form from "next/form";
 import { BarChart3 } from "lucide-react";
 import { CsvDownload } from "@/components/csv-download";
 import { requireAdmin } from "@/lib/data";
@@ -17,7 +18,7 @@ export default async function ReportsPage({searchParams}:{searchParams:Promise<{
   const links=[{key:"today",label:"Hari Ini"},{key:"yesterday",label:"Kemarin"},{key:"7days",label:"7 Hari"},{key:"month",label:"Bulan Ini"}];
   return <main className="page"><div className="page-head"><div><p className="eyebrow">Analisis penjualan</p><h1>Laporan</h1><p className="subtle">Berdasarkan snapshot harga dan HPP saat transaksi.</p></div><CsvDownload rows={rows} from={from} to={to}/></div>
     <div className="filters">{links.map(link=><Link key={link.key} href={`/reports?preset=${link.key}`} className={`filter ${preset===link.key?"active":""}`}>{link.label}</Link>)}</div>
-    <form className="card card-pad form-grid two section" action="/reports"><input type="hidden" name="preset" value="custom"/><div className="field"><label htmlFor="from">Dari tanggal</label><input id="from" name="from" className="input" type="date" defaultValue={from} required/></div><div className="field"><label htmlFor="to">Sampai tanggal</label><input id="to" name="to" className="input" type="date" defaultValue={to} required/></div><button className="btn btn-secondary">Terapkan Rentang</button></form>
+    <Form className="card card-pad form-grid two section" action="/reports"><input type="hidden" name="preset" value="custom"/><div className="field"><label htmlFor="from">Dari tanggal</label><input id="from" name="from" className="input" type="date" defaultValue={from} required/></div><div className="field"><label htmlFor="to">Sampai tanggal</label><input id="to" name="to" className="input" type="date" defaultValue={to} required/></div><button className="btn btn-secondary">Terapkan Rentang</button></Form>
     <p className="subtle section">Periode <strong>{from}</strong> sampai <strong>{to}</strong> · zona waktu Asia/Makassar</p>
     <div className="grid metrics">
       <article className="card metric primary"><div className="label">Omzet</div><div className="value">{rupiah(revenue)}</div><div className="tiny">{transactions} transaksi</div></article>

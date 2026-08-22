@@ -2,10 +2,12 @@
 
 import { FormEvent, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { LoaderCircle, LogIn } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
-export function LoginForm({ configured }: { configured: boolean }) {
+export function LoginForm({ configured, nextPath = "/cashier" }: { configured: boolean; nextPath?: string }) {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -14,7 +16,7 @@ export function LoginForm({ configured }: { configured: boolean }) {
     event.preventDefault(); setError(""); setPending(true);
     const { error: authError } = await createClient().auth.signInWithPassword({ email, password });
     if (authError) { setError(authError.message === "Invalid login credentials" ? "Email atau kata sandi tidak sesuai." : authError.message); setPending(false); return; }
-    window.location.assign("/cashier");
+    router.replace(nextPath);
   }
   if (!configured) return <div className="error">Supabase belum dikonfigurasi. Isi variabel pada <strong>.env.local</strong>, jalankan migration dan seed, lalu muat ulang halaman.</div>;
   return <form className="auth-form form-grid" onSubmit={submit}>
@@ -43,6 +45,7 @@ export function ForgotForm({ configured }: { configured: boolean }) {
 }
 
 export function ResetPasswordForm() {
+  const router = useRouter();
   const [password, setPassword] = useState(""); const [confirm, setConfirm] = useState("");
   const [message, setMessage] = useState(""); const [pending, setPending] = useState(false);
   async function submit(event: FormEvent) {
@@ -50,7 +53,7 @@ export function ResetPasswordForm() {
     if (password !== confirm) { setMessage("Konfirmasi kata sandi tidak sama."); return; }
     setPending(true); const { error } = await createClient().auth.updateUser({ password });
     if (error) { setMessage(error.message); setPending(false); return; }
-    window.location.assign("/cashier");
+    router.replace("/cashier");
   }
   return <form className="auth-form form-grid" onSubmit={submit}>
     {message && <div className="error">{message}</div>}

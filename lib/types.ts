@@ -33,6 +33,8 @@ export interface Sale {
   payment_method: PaymentMethod | null;
   subtotal: number;
   total_amount: number;
+  amount_received: number | null;
+  change_amount: number | null;
   total_cogs: number | null;
   gross_profit: number | null;
   status: "completed" | "voided";
@@ -80,4 +82,3 @@ export interface ReportRow extends SaleItem {
     profiles?: { full_name: string } | null;
   };
 }
-

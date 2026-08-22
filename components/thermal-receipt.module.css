@@ -1,0 +1,164 @@
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.printArea {
+  display: none;
+}
+
+.receipt {
+  width: var(--receipt-width);
+  margin: 0;
+  padding: 4mm 3mm 5mm;
+  overflow: hidden;
+  background: #fff;
+  color: #000;
+  font-family: "Courier New", ui-monospace, monospace;
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.paper58 {
+  --receipt-width: 52mm;
+}
+
+.paper80 {
+  --receipt-width: 72mm;
+}
+
+.header {
+  text-align: center;
+}
+
+.logo {
+  width: 23mm;
+  height: 18mm;
+  margin: 0 auto 1mm;
+  display: block;
+  object-fit: contain;
+  filter: grayscale(1) contrast(1.2);
+}
+
+.businessName {
+  margin: 0;
+  font-family: Georgia, serif;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: .02em;
+}
+
+.tagline {
+  margin: 1mm 0 2mm;
+  font-size: 8px;
+}
+
+.contacts {
+  display: grid;
+  gap: .8mm;
+  margin: 2mm 0;
+  font-size: 8.5px;
+}
+
+.contact {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5mm;
+  overflow-wrap: anywhere;
+}
+
+.contact svg {
+  width: 9px;
+  height: 9px;
+  flex: 0 0 auto;
+  stroke-width: 2;
+}
+
+.rule {
+  height: 0;
+  margin: 2mm 0;
+  border: 0;
+  border-top: 1px dashed #000;
+}
+
+.meta,
+.summary {
+  display: grid;
+  gap: .8mm;
+}
+
+.metaRow,
+.summaryRow,
+.itemLine {
+  display: flex;
+  justify-content: space-between;
+  gap: 3mm;
+}
+
+.metaRow span:first-child,
+.summaryRow span:first-child {
+  flex: 0 0 auto;
+}
+
+.metaRow span:last-child,
+.summaryRow strong,
+.itemLine span:last-child {
+  min-width: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.item {
+  margin: 0 0 1.8mm;
+}
+
+.itemName {
+  margin-bottom: .5mm;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.itemLine {
+  padding-left: 2mm;
+}
+
+.grandTotal {
+  padding-top: 1mm;
+  border-top: 1px solid #000;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.note {
+  margin-top: 2mm;
+  overflow-wrap: anywhere;
+}
+
+.voided {
+  margin: 2mm 0;
+  padding: 1.5mm;
+  border: 2px solid #000;
+  font-size: 12px;
+  font-weight: 900;
+  text-align: center;
+  letter-spacing: .08em;
+}
+
+.footer {
+  margin-top: 3mm;
+  text-align: center;
+  font-size: 8.5px;
+}
+
+.footer strong {
+  display: block;
+  margin-bottom: 1mm;
+  font-size: 9.5px;
+}
+
+@page {
+  size: auto;
+  margin: 0;
+}

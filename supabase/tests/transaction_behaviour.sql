@@ -1,7 +1,7 @@
 -- Behavioural database tests. Run after `supabase start` using `supabase test db`.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(16);
+select plan(24);
 
 insert into auth.users(id, email, encrypted_password, email_confirmed_at, aud, role)
 values
@@ -50,6 +50,27 @@ select public.void_sale((select id from public.sales where idempotency_key='3333
 select is((select stock_quantity from public.products where sku='TEST-MURNI-60'),10,'void restores stock exactly once');
 select is((select status::text from public.sales where idempotency_key='33333333-3333-3333-3333-333333333333'),'voided','void preserves and marks sale');
 select throws_ok($$select public.void_sale((select id from public.sales where idempotency_key='33333333-3333-3333-3333-333333333333'),'Ulang')$$,'P0001',null,'double void is rejected');
+
+select lives_ok($$
+  select * from public.create_sale_with_payment(
+    jsonb_build_array(jsonb_build_object('product_id',(select id from public.products where sku='TEST-MURNI-60'),'quantity',1)),
+    'cash','cash tender test','55555555-5555-5555-5555-555555555555',100000)
+$$, 'cash tender sale commits atomically');
+select is((select amount_received from public.sales where idempotency_key='55555555-5555-5555-5555-555555555555'),100000::numeric,'cash tender is persisted');
+select is((select change_amount from public.sales where idempotency_key='55555555-5555-5555-5555-555555555555'),30000::numeric,'change is calculated from authoritative total');
+select is((select stock_quantity from public.products where sku='TEST-MURNI-60'),9,'cash tender sale decreases stock once');
+select lives_ok($$
+  select * from public.create_sale_with_payment(
+    jsonb_build_array(jsonb_build_object('product_id',(select id from public.products where sku='TEST-MURNI-60'),'quantity',1)),
+    'cash','cash tender retry','55555555-5555-5555-5555-555555555555',100000)
+$$, 'cash tender retry is idempotent');
+select is((select stock_quantity from public.products where sku='TEST-MURNI-60'),9,'cash tender retry does not decrease stock twice');
+select throws_ok($$
+  select * from public.create_sale_with_payment(
+    jsonb_build_array(jsonb_build_object('product_id',(select id from public.products where sku='TEST-MURNI-60'),'quantity',1)),
+    'cash',null,'66666666-6666-6666-6666-666666666666',50000)
+$$,'P0001',null,'insufficient cash tender is rejected');
+select is((select stock_quantity from public.products where sku='TEST-MURNI-60'),9,'rejected tender rolls back stock changes');
 
 set local request.jwt.claim.sub = '22222222-2222-2222-2222-222222222222';
 select throws_ok($$select public.adjust_stock((select id from public.products where sku='TEST-MURNI-60'),1,'cashier attempt')$$,'42501',null,'cashier cannot adjust stock');

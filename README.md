@@ -1,6 +1,6 @@
 # EYFA Natural Oil POS
 
-Aplikasi kasir mobile-first, inventori, HPP, dan laporan penjualan berbasis Next.js dan Supabase. Seluruh perubahan finansial/stok dilakukan oleh RPC PostgreSQL atomik; browser tidak dapat menulis tabel inti secara langsung.
+Aplikasi kasir mobile-first, inventori, HPP, dan laporan penjualan berbasis Next.js dan Supabase. Seluruh perubahan finansial/stok dilakukan oleh RPC PostgreSQL atomik; browser tidak dapat menulis tabel inti secara langsung. Pembayaran tunai menyimpan uang diterima dan kembalian agar struk thermal 58/80 mm dapat dicetak ulang.
 
 ## Menjalankan lokal
 
@@ -32,4 +32,6 @@ npm test
 npm run build
 ```
 
-Lihat [supabase/migrations/202608220001_initial_schema.sql](supabase/migrations/202608220001_initial_schema.sql) untuk tabel, RLS, indeks, realtime, storage, dan RPC transaksi.
+Migration kedua, [supabase/migrations/202608230001_performance_and_cash_tender.sql](supabase/migrations/202608230001_performance_and_cash_tender.sql), menambahkan nominal tunai/kembalian, RPC checkout kompatibel, indeks ledger terbaru, dan evaluasi RLS per-statement yang lebih ringan. Jalankan `supabase db push` pada proyek yang sudah memakai migration awal.
+
+Navigasi operasional memakai loading skeleton per rute dan partial prefetch bawaan Next.js. Data dashboard/kasir diambil paralel; aplikasi sengaja tidak melakukan full prefetch seluruh data transaksi agar database tidak menerima request spekulatif dan data stok tidak menjadi basi.

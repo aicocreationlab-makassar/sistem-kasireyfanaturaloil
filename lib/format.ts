@@ -6,6 +6,16 @@ export const rupiah = new Intl.NumberFormat("id-ID", {
 
 export const number = new Intl.NumberFormat("id-ID").format;
 
+export function rupiahDigits(value: string | number | null | undefined, maxDigits = 12) {
+  const digits = String(value ?? "").replace(/\D/g, "").slice(0, maxDigits);
+  return digits.replace(/^0+(?=\d)/, "");
+}
+
+export function parseRupiahInput(value: string | number | null | undefined) {
+  const digits = rupiahDigits(value);
+  return digits ? Number(digits) : 0;
+}
+
 const makassarDateTime = new Intl.DateTimeFormat("id-ID", {
   timeZone: "Asia/Makassar",
   dateStyle: "medium",
@@ -34,4 +44,3 @@ export function stockStatus(stock: number, threshold: number) {
   if (stock <= threshold) return { label: "Stok menipis", tone: "warning" as const };
   return { label: "Aman", tone: "success" as const };
 }
-

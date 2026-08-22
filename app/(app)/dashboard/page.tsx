@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { AlertTriangle, ArrowRight, BarChart3, ShoppingBag } from "lucide-react";
 import { RealtimeRefresh } from "@/components/realtime-refresh";
-import { getDashboardData, getTodaySummary } from "@/lib/data";
+import { getDashboardData } from "@/lib/data";
 import { formatDateTime, number, rupiah } from "@/lib/format";
 
 export const metadata = { title: "Dashboard" };
 export default async function DashboardPage() {
-  const [summary, data] = await Promise.all([getTodaySummary(), getDashboardData()]);
+  const data = await getDashboardData();
+  const { summary } = data;
   const maxRevenue = Math.max(...data.trend.map((day) => day.revenue), 1);
   return <><RealtimeRefresh tables={["products","sales"]}/><main className="page">
     <div className="page-head"><div><p className="eyebrow">Ringkasan bisnis</p><h1>Dashboard</h1><p className="subtle">Angka hari ini mengikuti waktu Makassar.</p></div><Link href="/cashier" className="btn btn-primary">Buka Kasir</Link></div>
