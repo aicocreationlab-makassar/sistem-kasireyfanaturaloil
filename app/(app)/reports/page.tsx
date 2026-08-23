@@ -46,7 +46,7 @@ export default async function ReportsPage({ searchParams }: {
         {links.map((link) => <Link key={link.key} href={`/reports?preset=${link.key}`} prefetch className={`filter ${preset === link.key ? "active" : ""}`}>{link.label}</Link>)}
       </div>
 
-      <Form className="card card-pad form-grid two section" action="/reports">
+      <Form className="card card-pad report-range-form section" action="/reports">
         <input type="hidden" name="preset" value="custom" />
         <div className="field"><label htmlFor="from">Dari tanggal</label><input id="from" name="from" className="input" type="date" defaultValue={from} required /></div>
         <div className="field"><label htmlFor="to">Sampai tanggal</label><input id="to" name="to" className="input" type="date" defaultValue={to} required /></div>
@@ -57,7 +57,7 @@ export default async function ReportsPage({ searchParams }: {
 
       <div className="grid metrics">
         <article className="card metric primary"><div className="label">Omzet</div><div className="value">{rupiah(revenue)}</div><div className="tiny">{transactions} transaksi</div></article>
-        <article className="card metric"><div className="label">Produk Terjual</div><div className="value">{number(quantity)}</div><div className="tiny">unit</div></article>
+        <article className="card metric"><div className="label">Produk Terjual</div><div className="value">{number(quantity)}</div><div className="tiny">produk</div></article>
         <article className="card metric"><div className="label">Total HPP</div><div className="value">{cogs === null ? "—" : rupiah(cogs)}</div><div className="tiny">{cogs === null ? "HPP belum lengkap" : "Snapshot transaksi"}</div></article>
         <article className="card metric"><div className="label">Estimasi Laba Kotor</div><div className="value">{profit === null ? "—" : rupiah(profit)}</div><div className="tiny">{profit === null ? "Belum dapat dihitung" : `${revenue ? ((profit / revenue) * 100).toFixed(1) : 0}% margin`}</div></article>
       </div>
@@ -69,7 +69,7 @@ export default async function ReportsPage({ searchParams }: {
 
       <div className="split section">
         <section className="card card-pad"><p className="eyebrow">Rata-rata transaksi</p><div style={{ fontSize: 28, fontWeight: 850 }}>{rupiah(average)}</div></section>
-        <section className="card card-pad"><p className="eyebrow">Produk terlaris</p><h2>{best?.name || "Belum ada data"}</h2>{best && <p className="subtle">{number(best.quantity)} unit terjual</p>}</section>
+        <section className="card card-pad"><p className="eyebrow">Produk terlaris</p><h2>{best?.name || "Belum ada data"}</h2>{best && <p className="subtle">{number(best.quantity)} produk terjual</p>}</section>
       </div>
 
       <section className="section">

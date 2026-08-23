@@ -48,7 +48,7 @@ export async function createReportPdf(summary: ReportSummary) {
   const metrics = [
     `Omzet: ${rupiah(summary.revenue)}`,
     `Transaksi: ${number(summary.transactions)}`,
-    `Produk terjual: ${number(summary.quantity)} unit`,
+    `Produk terjual: ${number(summary.quantity)} produk`,
     `Rata-rata transaksi: ${rupiah(summary.average)}`,
     `Total HPP: ${summary.cogs === null ? "Belum lengkap" : rupiah(summary.cogs)}`,
     `Estimasi laba kotor: ${summary.profit === null ? "Belum dapat dihitung" : rupiah(summary.profit)}`,
@@ -86,7 +86,7 @@ export async function createReportPdf(summary: ReportSummary) {
     summary.topProducts.slice(0, 5).forEach((product, index) => {
       doc.setFont("helvetica", "normal");
       doc.text(`${index + 1}. ${product.name}`, margin, y);
-      doc.text(`${number(product.quantity)} unit | ${rupiah(product.revenue)}`, pageWidth - margin, y, { align: "right" });
+      doc.text(`${number(product.quantity)} produk | ${rupiah(product.revenue)}`, pageWidth - margin, y, { align: "right" });
       y += 6;
     });
   }

@@ -334,7 +334,7 @@ export function CashierPos({
             {cart.map((item) => <div className={styles.cartItem} key={item.product.id}>
               <div>
                 <h3>{item.product.name}</h3>
-                <span className="tiny">{rupiah(item.product.selling_price)} / unit</span>
+                <span className="tiny">{rupiah(item.product.selling_price)} / produk</span>
                 <div className={styles.cartPrice}>{rupiah(item.product.selling_price * item.quantity)}</div>
               </div>
               <div className={styles.controls}>
