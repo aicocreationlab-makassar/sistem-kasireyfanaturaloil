@@ -10,22 +10,28 @@
 
 .receipt {
   width: var(--receipt-width);
+  min-width: var(--receipt-width);
+  max-width: var(--receipt-width);
   margin: 0;
   padding: 4mm 3mm 5mm;
   overflow: hidden;
   background: #fff;
   color: #000;
   font-family: "Courier New", ui-monospace, monospace;
-  font-size: 10px;
+  font-size: var(--receipt-font-size);
   line-height: 1.35;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
 }
 
 .paper58 {
-  --receipt-width: 52mm;
+  --receipt-width: 58mm;
+  --receipt-font-size: 10px;
 }
 
 .paper80 {
-  --receipt-width: 72mm;
+  --receipt-width: 80mm;
+  --receipt-font-size: 11px;
 }
 
 .header {
@@ -70,8 +76,8 @@
 }
 
 .contact svg {
-  width: 9px;
-  height: 9px;
+  width: 10px;
+  height: 10px;
   flex: 0 0 auto;
   stroke-width: 2;
 }

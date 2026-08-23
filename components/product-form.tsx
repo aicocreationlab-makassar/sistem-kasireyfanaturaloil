@@ -128,9 +128,8 @@ export function ProductForm({ product, prefillBarcode = "" }: { product?: Produc
         : await supabase.rpc("create_product", { ...shared, p_initial_stock: Number(form.get("initial_stock")) });
       if (result.error) throw result.error;
 
-      const id = product?.id ?? result.data;
       toast({ message: product ? "Perubahan produk berhasil disimpan." : "Produk baru berhasil disimpan.", tone: "success" });
-      router.push(`/products/${id}`);
+      router.replace("/products");
     } catch (caught) {
       const message = errorMessage(caught);
       setError(message);

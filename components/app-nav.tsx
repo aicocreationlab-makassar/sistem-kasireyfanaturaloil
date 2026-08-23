@@ -3,6 +3,7 @@
 import Link, { useLinkStatus } from "next/link";
 import { usePathname } from "next/navigation";
 import { Boxes, ClipboardList, LoaderCircle, PackageSearch, Settings, ShoppingBasket, type LucideIcon } from "lucide-react";
+import { PoweredBy } from "@/components/powered-by";
 
 const links = [
   { href: "/cashier", label: "Kasir", icon: ShoppingBasket },
@@ -25,12 +26,15 @@ function NavContent({ icon: Icon, label }: { icon: LucideIcon; label: string }) 
 
 export function AppNav() {
   const pathname = usePathname();
-  return <nav className="bottom-nav" aria-label="Navigasi utama"><div className="nav-inner">
-    {links.map(({ href, label, icon: Icon }) => {
-      const active = pathname === href || pathname.startsWith(`${href}/`);
-      return <Link key={href} href={href} className={`nav-link ${active ? "active" : ""}`} aria-current={active ? "page" : undefined}>
-        <NavContent icon={Icon} label={label} />
-      </Link>;
-    })}
-  </div></nav>;
+  return <nav className="bottom-nav" aria-label="Navigasi utama">
+    <PoweredBy className="sidebar-powered-by" />
+    <div className="nav-inner">
+      {links.map(({ href, label, icon: Icon }) => {
+        const active = pathname === href || pathname.startsWith(`${href}/`);
+        return <Link key={href} href={href} className={`nav-link ${active ? "active" : ""}`} aria-current={active ? "page" : undefined}>
+          <NavContent icon={Icon} label={label} />
+        </Link>;
+      })}
+    </div>
+  </nav>;
 }

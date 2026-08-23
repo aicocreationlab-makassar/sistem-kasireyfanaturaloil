@@ -1,7 +1,7 @@
 -- Behavioural database tests. Run after `supabase start` using `supabase test db`.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(24);
+select plan(28);
 
 insert into auth.users(id, email, encrypted_password, email_confirmed_at, aud, role)
 values
@@ -18,6 +18,15 @@ select lives_ok($$
 $$, 'owner can create product with auditable initial stock');
 select is((select stock_quantity from public.products where sku='TEST-MURNI-60'),10,'initial stock is authoritative');
 select is((select count(*)::integer from public.stock_movements where movement_type='initial' and product_id=(select id from public.products where sku='TEST-MURNI-60')),1,'initial movement is recorded');
+
+select is(
+  public.decrease_stock((select id from public.products where sku='TEST-MURNI-60'),2,'Sampel promosi'),
+  8,
+  'dedicated decrease returns authoritative stock'
+);
+select is((select stock_quantity from public.products where sku='TEST-MURNI-60'),8,'dedicated decrease updates product stock');
+select is((select quantity_change from public.stock_movements where product_id=(select id from public.products where sku='TEST-MURNI-60') and movement_type='adjustment_out' order by created_at desc limit 1),-2,'dedicated decrease records a negative ledger change');
+select public.add_stock((select id from public.products where sku='TEST-MURNI-60'),2,'Restore test stock');
 
 select lives_ok($$
   select * from public.create_sale(
@@ -74,6 +83,7 @@ select is((select stock_quantity from public.products where sku='TEST-MURNI-60')
 
 set local request.jwt.claim.sub = '22222222-2222-2222-2222-222222222222';
 select throws_ok($$select public.adjust_stock((select id from public.products where sku='TEST-MURNI-60'),1,'cashier attempt')$$,'42501',null,'cashier cannot adjust stock');
+select throws_ok($$select public.decrease_stock((select id from public.products where sku='TEST-MURNI-60'),1,'cashier attempt')$$,'42501',null,'cashier cannot decrease stock');
 
 select * from finish();
 rollback;

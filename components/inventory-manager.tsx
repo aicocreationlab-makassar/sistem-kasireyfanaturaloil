@@ -21,7 +21,15 @@ const movementLabels: Record<StockMovement["movement_type"], string> = {
 };
 
 function errorMessage(error: unknown) {
-  return error instanceof Error ? error.message : "Terjadi kendala. Silakan coba lagi.";
+  const message = error instanceof Error
+    ? error.message
+    : typeof error === "object" && error && "message" in error
+      ? String(error.message)
+      : "Terjadi kendala. Silakan coba lagi.";
+  const code = typeof error === "object" && error && "code" in error ? String(error.code) : "";
+  if (code === "42501" || message.includes("owner/admin")) return "Akun ini belum memiliki akses owner/admin untuk mengubah stok.";
+  if (message.toLowerCase().includes("negatif") || message.toLowerCase().includes("tidak mencukupi")) return "Jumlah pengurangan melebihi stok yang tersedia.";
+  return message;
 }
 
 export function InventoryManager({ products, movements, canManage }: {
@@ -83,19 +91,27 @@ export function InventoryManager({ products, movements, canManage }: {
 
     try {
       const supabase = createClient();
-      const result = selectedOperation.type === "add"
-        ? await supabase.rpc("add_stock", {
+      let result;
+      if (selectedOperation.type === "add") {
+        result = await supabase.rpc("add_stock", {
             p_product_id: selectedOperation.product.id,
             p_quantity: quantity,
             p_note: String(form.get("note") || "").trim() || null,
             p_unit_cost: unitCost,
             p_update_hpp: updateHpp,
-          })
-        : await supabase.rpc("adjust_stock", {
-            p_product_id: selectedOperation.product.id,
-            p_quantity_change: -quantity,
-            p_reason: String(form.get("reason") || "").trim(),
           });
+      } else {
+        const params = {
+            p_product_id: selectedOperation.product.id,
+            p_reason: String(form.get("reason") || "").trim(),
+          };
+        result = await supabase.rpc("decrease_stock", { ...params, p_quantity: quantity });
+
+        // Keeps existing deployments usable until the new migration is applied.
+        if (result.error && (result.error.code === "PGRST202" || result.error.message.includes("decrease_stock"))) {
+          result = await supabase.rpc("adjust_stock", { ...params, p_quantity_change: -quantity });
+        }
+      }
 
       if (result.error) throw result.error;
 

@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { Globe2, Instagram, MessageCircle, Printer } from "lucide-react";
-import { useState } from "react";
+import { Globe2, Instagram, Printer } from "lucide-react";
+import { type SVGProps, useState } from "react";
+import { flushSync } from "react-dom";
 import { formatDateTime, rupiah } from "@/lib/format";
 import type { PaymentMethod } from "@/lib/types";
 import styles from "./thermal-receipt.module.css";
@@ -34,18 +35,39 @@ const paymentLabels: Record<PaymentMethod, string> = {
   other: "Lainnya",
 };
 
+function WhatsappIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 32 32" role="img" aria-label="WhatsApp" {...props}>
+      <path fill="currentColor" d="M16 3A12.8 12.8 0 0 0 5.04 22.43L3.2 29l6.73-1.77A12.8 12.8 0 1 0 16 3Zm0 23.27c-2.08 0-4.03-.61-5.67-1.66l-.4-.25-3.99 1.05 1.07-3.89-.27-.41A10.47 10.47 0 1 1 16 26.27Z" />
+      <path fill="currentColor" d="M21.75 18.34c-.31-.16-1.86-.92-2.15-1.02-.29-.1-.5-.16-.71.16-.21.31-.81 1.02-1 1.23-.18.21-.36.23-.68.08-.31-.16-1.32-.49-2.52-1.56-.93-.83-1.56-1.86-1.74-2.17-.18-.32-.02-.49.14-.65.14-.14.31-.36.47-.55.16-.18.21-.31.31-.52.11-.21.05-.39-.02-.55-.08-.16-.71-1.71-.97-2.34-.26-.61-.52-.53-.71-.54h-.61c-.21 0-.55.08-.84.39-.29.32-1.1 1.08-1.1 2.62s1.13 3.04 1.28 3.25c.16.21 2.22 3.39 5.38 4.76.75.32 1.34.52 1.79.67.75.24 1.44.21 1.98.13.6-.09 1.86-.76 2.12-1.5.26-.73.26-1.36.18-1.49-.08-.13-.29-.21-.6-.36Z" />
+    </svg>
+  );
+}
+
 export function ThermalReceipt({ sale, items }: { sale: ReceiptData; items: ReceiptLine[] }) {
   const [paper, setPaper] = useState<"58" | "80">("80");
 
   function printReceipt(size: "58" | "80") {
-    setPaper(size);
+    flushSync(() => setPaper(size));
+    const printStyle = document.createElement("style");
+    printStyle.id = "eyfa-thermal-page-size";
+    printStyle.textContent = `@page { size: ${size}mm auto; margin: 0 !important; }`;
+    document.getElementById(printStyle.id)?.remove();
+    document.head.appendChild(printStyle);
+    document.body.dataset.thermalPaper = size;
     document.body.classList.add("receipt-printing");
-    const cleanup = () => document.body.classList.remove("receipt-printing");
+    let fallbackTimer = 0;
+    const cleanup = () => {
+      document.body.classList.remove("receipt-printing");
+      delete document.body.dataset.thermalPaper;
+      document.getElementById(printStyle.id)?.remove();
+      window.clearTimeout(fallbackTimer);
+    };
     window.addEventListener("afterprint", cleanup, { once: true });
+    fallbackTimer = window.setTimeout(cleanup, 60000);
     window.requestAnimationFrame(() => {
       window.requestAnimationFrame(() => {
         window.print();
-        window.setTimeout(cleanup, 500);
       });
     });
   }
@@ -69,7 +91,7 @@ export function ThermalReceipt({ sale, items }: { sale: ReceiptData; items: Rece
           <h1 className={styles.businessName}>EYFA Natural Oil</h1>
           <p className={styles.tagline}>Minyak kemiri alami untuk perawatan rambut</p>
           <div className={styles.contacts}>
-            <div className={styles.contact}><MessageCircle aria-hidden="true" /><span>087872252079</span></div>
+            <div className={styles.contact}><WhatsappIcon /><span>087872252079</span></div>
             <div className={styles.contact}><Instagram aria-hidden="true" /><span>@eyfanaturaloil</span></div>
             <div className={styles.contact}><Globe2 aria-hidden="true" /><span>eyfa.dekatlokal.com</span></div>
           </div>

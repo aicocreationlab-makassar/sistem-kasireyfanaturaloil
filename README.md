@@ -34,4 +34,6 @@ npm run build
 
 Migration kedua, [supabase/migrations/202608230001_performance_and_cash_tender.sql](supabase/migrations/202608230001_performance_and_cash_tender.sql), menambahkan nominal tunai/kembalian, RPC checkout kompatibel, indeks ledger terbaru, dan evaluasi RLS per-statement yang lebih ringan. Jalankan `supabase db push` pada proyek yang sudah memakai migration awal.
 
+Migration ketiga, [supabase/migrations/202608230002_fix_stock_decrease.sql](supabase/migrations/202608230002_fix_stock_decrease.sql), menambahkan RPC `decrease_stock` yang menerima jumlah positif, mengunci stok produk, mengurangi stok, dan mencatat ledger secara atomik. Migration ini wajib diterapkan agar tombol **Kurangi Stok** memakai alur baru.
+
 Navigasi operasional memakai loading skeleton per rute dan partial prefetch bawaan Next.js. Data dashboard/kasir diambil paralel; aplikasi sengaja tidak melakukan full prefetch seluruh data transaksi agar database tidak menerima request spekulatif dan data stok tidak menjadi basi.

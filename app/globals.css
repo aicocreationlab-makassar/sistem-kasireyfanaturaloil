@@ -22,7 +22,7 @@ button, input, select, textarea { min-width: 0; font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
 a { color: inherit; text-decoration: none; }
 
-.app-shell { min-width: 0; min-height: 100dvh; padding-bottom: calc(78px + env(safe-area-inset-bottom)); }
+.app-shell { min-width: 0; min-height: calc(100dvh - 62px); padding-bottom: calc(78px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; }
 .page { width: min(100%, 1180px); min-width: 0; margin: 0 auto; padding: 20px 16px 32px; animation: page-enter .18s ease-out both; }
 .page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
 .page-head > *, .section-head > *, .grid > *, .split > *, .form-grid > * { min-width: 0; }
@@ -51,6 +51,13 @@ h3 { margin-bottom: 5px; font-size: 15px; }
 .nav-link svg { width: 20px; height: 20px; }
 .nav-link.active { color: var(--brand); }
 .nav-link.active svg { stroke-width: 2.6; }
+.powered-by-link { min-width: 0; display: inline-flex; align-items: center; justify-content: center; gap: 7px; color: var(--muted); font-size: 10px; font-weight: 800; line-height: 1; white-space: nowrap; transition: color .16s ease, border-color .16s ease, background-color .16s ease, transform .16s ease; }
+.powered-by-link:hover { color: var(--brand); }
+.powered-by-link:active { transform: scale(.98); }
+.powered-by-link img { width: 92px; height: 23px; object-fit: contain; }
+.sidebar-powered-by { display: none; }
+.app-footer { width: min(100%, 1180px); margin: auto auto 0; padding: 20px 16px 10px; display: flex; justify-content: center; }
+.footer-powered-by { max-width: 100%; padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; background: rgba(255,255,255,.72); }
 
 .card { min-width: 0; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); box-shadow: var(--shadow); }
 a.card, button.card { transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease; }
@@ -157,6 +164,13 @@ a.card:hover, button.card:hover { border-color: #b9cbbd; box-shadow: 0 11px 30px
 .filters { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
 .filter { min-height: 38px; padding: 8px 12px; flex: 0 0 auto; border: 1px solid var(--line); border-radius: 999px; background: white; cursor: pointer; color: var(--muted); font-size: 12px; font-weight: 800; }
 .filter.active { border-color: var(--brand); background: var(--brand); color: white; }
+.report-actions { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+.report-story { border-color: #cbdccb; background: linear-gradient(135deg, #fff, #f3f8f3); }
+.report-story-title { display: flex; align-items: flex-start; gap: 11px; }
+.report-story-title > svg { width: 25px; height: 25px; flex: 0 0 auto; color: var(--brand); }
+.report-story-title h2 { margin-bottom: 8px; }
+.report-story > p { margin: 0 0 10px; color: #435047; font-size: 14px; line-height: 1.65; }
+.report-story > p:last-child { margin-bottom: 0; }
 .chart { height: 150px; display: flex; align-items: end; gap: 7px; padding-top: 18px; }
 .bar-wrap { height: 100%; flex: 1; display: flex; flex-direction: column; justify-content: end; align-items: center; gap: 6px; }
 .bar { width: 100%; max-width: 38px; min-height: 3px; border-radius: 6px 6px 2px 2px; background: #6f9a79; }
@@ -173,6 +187,8 @@ a.card:hover, button.card:hover { border-color: #b9cbbd; box-shadow: 0 11px 30px
   .page { padding-right: 12px; padding-left: 12px; }
   .page-head { flex-wrap: wrap; }
   .page-head > .btn { min-height: 42px; }
+  .report-actions { width: 100%; justify-content: stretch; }
+  .report-actions .btn { flex: 1 1 145px; }
   .metrics { gap: 8px; }
   .metric { min-height: 102px; padding: 12px; }
   .product-grid { gap: 9px; }
@@ -190,6 +206,9 @@ a.card:hover, button.card:hover { border-color: #b9cbbd; box-shadow: 0 11px 30px
   .cart-controls { flex-wrap: wrap; justify-content: flex-end; }
   .total-row { align-items: flex-start; }
   .total-row strong { max-width: 60%; text-align: right; overflow-wrap: anywhere; }
+  .app-footer { padding-right: 12px; padding-left: 12px; }
+  .footer-powered-by { font-size: 9px; }
+  .footer-powered-by img { width: 80px; height: 20px; }
 }
 
 @media (min-width: 680px) {
@@ -208,10 +227,13 @@ a.card:hover, button.card:hover { border-color: #b9cbbd; box-shadow: 0 11px 30px
 @media (min-width: 1000px) {
   .app-shell { padding-bottom: 0; padding-left: 230px; }
   .topbar { margin-left: 230px; }
-  .bottom-nav { top: 0; right: auto; width: 230px; height: 100dvh; border-top: 0; border-right: 1px solid var(--line); padding: 92px 14px 20px; }
+  .bottom-nav { top: 0; right: auto; width: 230px; height: 100dvh; border-top: 0; border-right: 1px solid var(--line); padding: 86px 14px 20px; }
   .nav-inner { display: flex; flex-direction: column; gap: 6px; }
   .nav-link { min-height: 48px; padding: 0 14px; flex-direction: row; justify-content: flex-start; gap: 12px; border-radius: 12px; font-size: 13px; }
   .nav-link.active { background: #e8efe8; }
+  .sidebar-powered-by { position: absolute; top: 17px; left: 14px; width: calc(100% - 28px); display: inline-flex; padding: 10px 9px; border: 1px solid var(--line); border-radius: 13px; background: #f8faf8; }
+  .sidebar-powered-by:hover { border-color: #b9cbbd; background: #f1f6f2; }
+  .sidebar-powered-by img { width: 100px; height: 25px; }
   .product-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .cart-fab { right: 24px; bottom: 24px; left: auto; }
 }
@@ -227,8 +249,16 @@ a.card:hover, button.card:hover { border-color: #b9cbbd; box-shadow: 0 11px 30px
     left: 0;
     display: block !important;
     width: var(--receipt-width);
+    min-width: var(--receipt-width) !important;
+    max-width: var(--receipt-width) !important;
     min-height: 0;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    zoom: 1 !important;
+    overflow: visible !important;
   }
+  body.receipt-printing [data-thermal-receipt] > * { width: var(--receipt-width) !important; min-width: var(--receipt-width) !important; max-width: var(--receipt-width) !important; transform: none !important; }
   body.receipt-printing .sheet-backdrop,
   body.receipt-printing .sheet {
     position: static !important;

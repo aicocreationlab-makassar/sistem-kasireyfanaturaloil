@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { AppFooter } from "@/components/app-footer";
 import { AppNav } from "@/components/app-nav";
 import { ToastProvider } from "@/components/toast-provider";
 import { Topbar, TopbarSkeleton } from "@/components/topbar";
@@ -16,7 +17,10 @@ export default function OperationalLayout({ children }: { children: React.ReactN
     <Suspense fallback={<TopbarSkeleton />}>
       <SessionTopbar />
     </Suspense>
-    <div className="app-shell">{children}</div>
+    <div className="app-shell">
+      {children}
+      <AppFooter />
+    </div>
     <AppNav />
   </ToastProvider>;
 }
