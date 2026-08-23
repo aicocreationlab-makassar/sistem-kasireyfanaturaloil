@@ -1,6 +1,6 @@
 "use client";
 
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import { History, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { RupiahInput } from "@/components/rupiah-input";
@@ -44,6 +44,23 @@ export function InventoryManager({ products, movements, canManage }: {
   const [error, setError] = useState("");
   const [updateHpp, setUpdateHpp] = useState(false);
 
+  useEffect(() => {
+    if (!operation) return;
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || pending) return;
+      setError("");
+      setUpdateHpp(false);
+      setOperation(null);
+    };
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [operation, pending]);
+
   function openOperation(type: "add" | "subtract", product: Product) {
     setError("");
     setUpdateHpp(false);
@@ -70,7 +87,7 @@ export function InventoryManager({ products, movements, canManage }: {
       return;
     }
     if (operation.type === "subtract" && quantity > operation.product.stock_quantity) {
-      const message = `Stok hanya tersisa ${operation.product.stock_quantity} unit. Jumlah pengurangan terlalu besar.`;
+      const message = `Stok hanya tersisa ${operation.product.stock_quantity} produk. Jumlah pengurangan terlalu besar.`;
       setError(message);
       toast({ message, tone: "error" });
       return;
@@ -79,7 +96,7 @@ export function InventoryManager({ products, movements, canManage }: {
     const unitCostText = String(form.get("unit_cost") ?? "").trim();
     const unitCost = unitCostText === "" ? null : Number(unitCostText);
     if (operation.type === "add" && updateHpp && unitCost === null) {
-      const message = "Isi biaya per unit jika HPP ingin diperbarui.";
+      const message = "Isi biaya per produk jika HPP ingin diperbarui.";
       setError(message);
       toast({ message, tone: "error" });
       return;
@@ -120,7 +137,7 @@ export function InventoryManager({ products, movements, canManage }: {
         : selectedOperation.product.stock_quantity + (selectedOperation.type === "add" ? quantity : -quantity);
       toast({
         tone: "success",
-        message: `${selectedOperation.type === "add" ? "Stok berhasil ditambah" : "Stok berhasil dikurangi"}. Stok sekarang ${newStock} unit.`,
+        message: `${selectedOperation.type === "add" ? "Stok berhasil ditambah" : "Stok berhasil dikurangi"}. Stok sekarang ${newStock} produk.`,
       });
       setOperation(null);
       setUpdateHpp(false);
@@ -150,7 +167,7 @@ export function InventoryManager({ products, movements, canManage }: {
               </div>
               <div style={{ flex: "0 0 auto" }}>
                 <div className="list-value" style={{ fontSize: 22 }}>{product.stock_quantity}</div>
-                <div className="tiny" style={{ textAlign: "right" }}>unit</div>
+                <div className="tiny" style={{ textAlign: "right" }}>produk</div>
                 {canManage && (
                   <div className="stock-actions">
                     <button type="button" className="btn btn-secondary stock-action-btn" onClick={() => openOperation("add", product)} aria-label={`Tambah stok ${product.name}`}>
@@ -190,14 +207,13 @@ export function InventoryManager({ products, movements, canManage }: {
       )}
 
       {operation && (
-        <div className="sheet-backdrop" onMouseDown={(event) => event.target === event.currentTarget && closeOperation()}>
-          <form className="sheet form-grid" onSubmit={submit} aria-label={operation.type === "add" ? "Tambah stok" : "Kurangi stok"}>
-            <div className="sheet-handle" />
+        <div className="stock-modal-backdrop" onMouseDown={(event) => event.target === event.currentTarget && closeOperation()}>
+          <form className="stock-modal form-grid" onSubmit={submit} role="dialog" aria-modal="true" aria-label={operation.type === "add" ? "Tambah stok" : "Kurangi stok"}>
             <div className="sheet-head">
               <div style={{ minWidth: 0 }}>
                 <p className="eyebrow">{operation.type === "add" ? "Stok Masuk" : "Kurangi Stok"}</p>
                 <h2 style={{ overflowWrap: "anywhere" }}>{operation.product.name}</h2>
-                <p className="subtle">Stok saat ini: {operation.product.stock_quantity} unit</p>
+                <p className="subtle">Stok saat ini: {operation.product.stock_quantity} produk</p>
               </div>
               <button type="button" className="btn icon-btn" onClick={closeOperation} disabled={pending} aria-label="Tutup"><X /></button>
             </div>
@@ -205,14 +221,14 @@ export function InventoryManager({ products, movements, canManage }: {
             {error && <div className="error" role="alert">{error}</div>}
             <div className="field">
               <label htmlFor="quantity">{operation.type === "add" ? "Jumlah yang ditambahkan" : "Jumlah yang dikurangi"}</label>
-              <input id="quantity" name="quantity" className="input" type="number" inputMode="numeric" min="1" max={operation.type === "subtract" ? operation.product.stock_quantity : undefined} step="1" required placeholder="Contoh: 2" />
+              <input id="quantity" name="quantity" className="input" type="number" inputMode="numeric" min="1" max={operation.type === "subtract" ? operation.product.stock_quantity : undefined} step="1" required placeholder="Contoh: 2" autoFocus />
               {operation.type === "subtract" && <span className="help">Masukkan angka positif. Sistem akan mengurangi stok secara otomatis.</span>}
             </div>
 
             {operation.type === "add" ? (
               <>
                 <div className="field">
-                  <label htmlFor="unit_cost">Biaya per unit (opsional)</label>
+                  <label htmlFor="unit_cost">Biaya per produk (opsional)</label>
                   <RupiahInput id="unit_cost" name="unit_cost" />
                   <label style={{ display: "flex", gap: 8, alignItems: "flex-start", fontWeight: 600 }}>
                     <input type="checkbox" checked={updateHpp} onChange={(event) => setUpdateHpp(event.target.checked)} style={{ marginTop: 3, flex: "0 0 auto" }} />

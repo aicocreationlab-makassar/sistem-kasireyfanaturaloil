@@ -39,7 +39,7 @@ export default async function SaleDetailPage({ params }: { params: Promise<{ id:
         <div>
           <h3>{item.product_name_snapshot}</h3>
           <div className="tiny">{item.sku_snapshot} · {item.quantity} × {rupiah(item.unit_selling_price)}</div>
-          {profile.role !== "cashier" && <div className="tiny">HPP/unit: {item.unit_hpp === null ? "Belum diatur" : rupiah(item.unit_hpp)}</div>}
+          {profile.role !== "cashier" && <div className="tiny">HPP/produk: {item.unit_hpp === null ? "Belum diatur" : rupiah(item.unit_hpp)}</div>}
         </div>
         <div className="list-value">{rupiah(item.line_revenue)}</div>
       </div>)}

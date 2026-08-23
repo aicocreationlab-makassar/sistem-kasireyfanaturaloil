@@ -39,14 +39,14 @@ export function buildReportStory(summary: ReportSummary) {
   }
 
   const paragraphs = [
-    `Pada ${period}, EYFA mencatat ${number(summary.transactions)} transaksi selesai dengan omzet ${rupiah(summary.revenue)}. Sebanyak ${number(summary.quantity)} unit produk terjual, dengan nilai rata-rata ${rupiah(summary.average)} per transaksi.`,
+    `Pada ${period}, EYFA mencatat ${number(summary.transactions)} transaksi selesai dengan omzet ${rupiah(summary.revenue)}. Sebanyak ${number(summary.quantity)} produk terjual, dengan nilai rata-rata ${rupiah(summary.average)} per transaksi.`,
   ];
 
   const best = summary.topProducts[0];
   if (best) {
     const share = summary.quantity ? (best.quantity / summary.quantity) * 100 : 0;
     paragraphs.push(
-      `${best.name} menjadi produk terlaris dengan ${number(best.quantity)} unit atau sekitar ${share.toFixed(1)}% dari seluruh unit terjual. Kontribusi omzet produk ini mencapai ${rupiah(best.revenue)}.`,
+      `${best.name} menjadi produk terlaris dengan ${number(best.quantity)} produk atau sekitar ${share.toFixed(1)}% dari seluruh produk terjual. Kontribusi omzet produk ini mencapai ${rupiah(best.revenue)}.`,
     );
   }
 

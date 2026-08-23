@@ -6,7 +6,7 @@ export function csvCell(value: string | number | null) {
 }
 
 export function salesCsv(rows: ReportRow[]) {
-  const header = ["Tanggal/Waktu", "Kode Transaksi", "Produk", "Varian", "Ukuran (ml)", "Jumlah", "Harga Jual", "Omzet", "HPP/Unit", "Total HPP", "Estimasi Laba Kotor", "Metode Pembayaran", "Kasir"];
+  const header = ["Tanggal/Waktu", "Kode Transaksi", "Produk", "Varian", "Ukuran (ml)", "Jumlah", "Harga Jual", "Omzet", "HPP/Produk", "Total HPP", "Estimasi Laba Kotor", "Metode Pembayaran", "Kasir"];
   const lines = rows.filter((row) => row.sales.status === "completed").map((row) => [
     row.sales.created_at, row.sales.transaction_code, row.product_name_snapshot, row.variant_snapshot,
     row.size_ml_snapshot, row.quantity, row.unit_selling_price, row.line_revenue, row.unit_hpp,
