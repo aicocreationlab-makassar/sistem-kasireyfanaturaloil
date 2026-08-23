@@ -276,7 +276,7 @@ export function CashierPos({
         <h3>Produk belum terdaftar</h3>
         <p className="subtle">Kode: <strong>{unknownCode}</strong></p>
         <div className="form-actions">
-          {canRegister && <Link className="btn btn-primary" href={`/products/new?barcode=${encodeURIComponent(unknownCode)}`}>Daftarkan Produk</Link>}
+          {canRegister && <Link className="btn btn-primary" href={`/products/new?barcode=${encodeURIComponent(unknownCode)}`} prefetch>Daftarkan Produk</Link>}
           <button className="btn btn-secondary" onClick={() => setScannerOpen(true)}>Scan Ulang</button>
         </div>
       </div>}
@@ -430,7 +430,7 @@ export function CashierPos({
         />
         <div className={styles.successActions}>
           <button className="btn btn-primary btn-wide" onClick={() => setSuccess(null)}>Transaksi Baru</button>
-          <Link className="btn btn-secondary btn-wide" href={`/sales/${success.id}`}>Lihat Detail Transaksi</Link>
+          <Link className="btn btn-secondary btn-wide" href={`/sales/${success.id}`} prefetch>Lihat Detail Transaksi</Link>
         </div>
       </section>
     </div>}

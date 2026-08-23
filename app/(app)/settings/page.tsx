@@ -3,6 +3,7 @@ import Link from "next/link";
 import { BarChart3, Bug, ChevronRight, ExternalLink, History, LockKeyhole } from "lucide-react";
 import { LogoutButton } from "@/components/logout-button";
 import { getSessionContext } from "@/lib/data";
+import { WHATSAPP_DISPLAY, WHATSAPP_URL } from "@/lib/contact";
 
 export const metadata = { title: "Menu & Profil" };
 
@@ -22,8 +23,8 @@ export default async function SettingsPage() {
       <section className="section">
         <h2>Pintasan</h2>
         <div className="card list">
-          <Link href="/dashboard" className="list-item"><div style={{ display: "flex", gap: 12, alignItems: "center" }}><BarChart3 color="var(--brand)" /><div><div className="list-title">Dashboard</div><div className="list-meta">Ringkasan omzet, tren, dan stok</div></div></div><ChevronRight /></Link>
-          <Link href="/sales" className="list-item"><div style={{ display: "flex", gap: 12, alignItems: "center" }}><History color="var(--brand)" /><div><div className="list-title">Riwayat Penjualan</div><div className="list-meta">Transaksi dan detail penjualan</div></div></div><ChevronRight /></Link>
+          <Link href="/dashboard" prefetch className="list-item"><div style={{ display: "flex", gap: 12, alignItems: "center" }}><BarChart3 color="var(--brand)" /><div><div className="list-title">Dashboard</div><div className="list-meta">Ringkasan omzet, tren, dan stok</div></div></div><ChevronRight /></Link>
+          <Link href="/sales" prefetch className="list-item"><div style={{ display: "flex", gap: 12, alignItems: "center" }}><History color="var(--brand)" /><div><div className="list-title">Riwayat Penjualan</div><div className="list-meta">Transaksi dan detail penjualan</div></div></div><ChevronRight /></Link>
         </div>
       </section>
 
@@ -35,7 +36,7 @@ export default async function SettingsPage() {
           <div>
             <h3>Bantuan sistem</h3>
             <p className="subtle" style={{ marginBottom: 10 }}>Jika menemukan bug, membutuhkan perbaikan, atau mengalami masalah pada sistem, harap hubungi Admin Dekat Lokal.</p>
-            <a className="btn btn-secondary" href="https://www.dekatloka.com" target="_blank" rel="noreferrer noopener">Hubungi Admin Dekat Lokal <ExternalLink size={16} /></a>
+            <a className="btn btn-secondary" href={WHATSAPP_URL} target="_blank" rel="noreferrer noopener" aria-label={`Hubungi Admin Dekat Lokal melalui WhatsApp ${WHATSAPP_DISPLAY}`}>Hubungi Kami via WhatsApp <ExternalLink size={16} /></a>
           </div>
         </div>
       </section>

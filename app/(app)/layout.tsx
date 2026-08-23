@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { AppFooter } from "@/components/app-footer";
 import { AppNav } from "@/components/app-nav";
+import { NavigationFeedback } from "@/components/navigation-feedback";
 import { ToastProvider } from "@/components/toast-provider";
 import { Topbar, TopbarSkeleton } from "@/components/topbar";
 import { getSessionContext } from "@/lib/data";
@@ -14,6 +15,7 @@ async function SessionTopbar() {
 
 export default function OperationalLayout({ children }: { children: React.ReactNode }) {
   return <ToastProvider>
+    <Suspense fallback={null}><NavigationFeedback /></Suspense>
     <Suspense fallback={<TopbarSkeleton />}>
       <SessionTopbar />
     </Suspense>

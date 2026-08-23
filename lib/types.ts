@@ -78,6 +78,7 @@ export interface StockMovement {
 export interface CartItem { product: Product; quantity: number }
 
 export interface ReportRow extends SaleItem {
+  products?: Pick<Product, "hpp"> | null;
   sales: Pick<Sale, "transaction_code" | "created_at" | "payment_method" | "status"> & {
     profiles?: { full_name: string } | null;
   };

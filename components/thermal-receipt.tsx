@@ -5,6 +5,7 @@ import { Globe2, Instagram, Printer } from "lucide-react";
 import { type SVGProps, useState } from "react";
 import { flushSync } from "react-dom";
 import { useToast } from "@/components/toast-provider";
+import { WHATSAPP_DISPLAY } from "@/lib/contact";
 import { formatDateTime, rupiah } from "@/lib/format";
 import type { PaymentMethod } from "@/lib/types";
 import styles from "./thermal-receipt.module.css";
@@ -103,7 +104,7 @@ export function ThermalReceipt({ sale, items }: { sale: ReceiptData; items: Rece
           <h1 className={styles.businessName}>EYFA Natural Oil</h1>
           <p className={styles.tagline}>Minyak kemiri alami untuk perawatan rambut</p>
           <div className={styles.contacts}>
-            <div className={styles.contact}><WhatsappIcon /><span>087872252079</span></div>
+            <div className={styles.contact}><WhatsappIcon /><span>{WHATSAPP_DISPLAY}</span></div>
             <div className={styles.contact}><Instagram aria-hidden="true" /><span>@eyfanaturaloil</span></div>
             <div className={styles.contact}><Globe2 aria-hidden="true" /><span>eyfa.dekatlokal.com</span></div>
           </div>

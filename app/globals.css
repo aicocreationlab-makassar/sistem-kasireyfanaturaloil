@@ -22,6 +22,11 @@ button, input, select, textarea { min-width: 0; font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
 a { color: inherit; text-decoration: none; }
 
+.navigation-progress { position: fixed; z-index: 110; top: 0; right: 0; left: 0; height: 3px; opacity: 0; overflow: hidden; pointer-events: none; transition: opacity .12s ease; }
+.navigation-progress::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, var(--brand), var(--accent), var(--brand)); transform: translateX(-100%); }
+.navigation-progress.visible { opacity: 1; }
+.navigation-progress.visible::before { animation: navigation-progress 1.1s ease-in-out infinite; }
+
 .app-shell { min-width: 0; min-height: calc(100dvh - 62px); padding-bottom: calc(78px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; }
 .page { width: min(100%, 1180px); min-width: 0; margin: 0 auto; padding: 20px 16px 32px; animation: page-enter .18s ease-out both; }
 .page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
@@ -43,7 +48,7 @@ h3 { margin-bottom: 5px; font-size: 15px; }
 .user-chip { display: flex; align-items: center; gap: 9px; min-width: 0; }
 .avatar { width: 34px; height: 34px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 50%; background: var(--brand); color: white; font-size: 12px; font-weight: 800; }
 .avatar.user-logo { overflow: hidden; border: 1px solid var(--line); background: white; }
-.avatar.user-logo img { width: 100%; height: 100%; padding: 3px; object-fit: contain; }
+.avatar.user-logo img { width: 100%; height: 100%; padding: 0; border-radius: 50%; object-fit: cover; }
 .user-copy { display: none; }
 
 .bottom-nav { position: fixed; z-index: 40; right: 0; bottom: 0; left: 0; height: calc(68px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: rgba(255,255,255,.97); padding-bottom: env(safe-area-inset-bottom); }
@@ -187,7 +192,9 @@ a.card:hover, button.card:hover { border-color: #b9cbbd; box-shadow: 0 11px 30px
 @keyframes backdrop-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes sheet-in { from { opacity: .75; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes skeleton-reveal { from { opacity: 0; } to { opacity: 1; } }
-.page-skeleton { animation: skeleton-reveal .16s .12s both; }
+.page-skeleton { animation: skeleton-reveal .12s ease-out both; }
+
+@keyframes navigation-progress { 0% { transform: translateX(-100%); } 55% { transform: translateX(-15%); } 100% { transform: translateX(100%); } }
 
 @media (max-width: 479px) {
   .page { padding-right: 12px; padding-left: 12px; }
