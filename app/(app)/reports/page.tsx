@@ -57,10 +57,11 @@ export default async function ReportsPage({ searchParams }: {
 
   const ranked = new Map<string, { name: string; quantity: number; revenue: number }>();
   for (const row of rows) {
-    const current = ranked.get(row.product_id) ?? { name: row.product_name_snapshot, quantity: 0, revenue: 0 };
+    const productKey = row.product_id ?? `deleted:${row.sku_snapshot}`;
+    const current = ranked.get(productKey) ?? { name: row.product_name_snapshot, quantity: 0, revenue: 0 };
     current.quantity += row.quantity;
     current.revenue += Number(row.line_revenue);
-    ranked.set(row.product_id, current);
+    ranked.set(productKey, current);
   }
   const topProducts = [...ranked.values()].sort((a, b) => b.quantity - a.quantity || b.revenue - a.revenue);
   const best = topProducts[0];
@@ -118,7 +119,7 @@ export default async function ReportsPage({ searchParams }: {
       </div>
 
       <section className="card card-pad report-story section">
-        <div className="report-story-title"><BookOpenText aria-hidden="true" /><div><p className="eyebrow">Cerita laporan</p><h2>Ringkasan untuk Owner</h2></div></div>
+        <div className="report-story-title"><BookOpenText aria-hidden="true" /><div><p className="eyebrow">Analisis otomatis</p><h2>Ringkasan Periode</h2></div></div>
         {story.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
       </section>
 

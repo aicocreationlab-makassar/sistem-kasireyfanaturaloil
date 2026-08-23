@@ -1,7 +1,7 @@
 "use client";
 
 import { type FormEvent, useState } from "react";
-import { History, MinusCircle, PlusCircle, X } from "lucide-react";
+import { History, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { RupiahInput } from "@/components/rupiah-input";
 import { useToast } from "@/components/toast-provider";
@@ -152,12 +152,12 @@ export function InventoryManager({ products, movements, canManage }: {
                 <div className="list-value" style={{ fontSize: 22 }}>{product.stock_quantity}</div>
                 <div className="tiny" style={{ textAlign: "right" }}>unit</div>
                 {canManage && (
-                  <div className="form-actions" style={{ marginTop: 8, gap: 5, flexWrap: "nowrap" }}>
-                    <button type="button" className="btn icon-btn btn-secondary" onClick={() => openOperation("add", product)} title="Tambah stok" aria-label={`Tambah stok ${product.name}`}>
-                      <PlusCircle size={19} />
+                  <div className="stock-actions">
+                    <button type="button" className="btn btn-secondary stock-action-btn" onClick={() => openOperation("add", product)} aria-label={`Tambah stok ${product.name}`}>
+                      Tambah
                     </button>
-                    <button type="button" className="btn icon-btn btn-secondary" onClick={() => openOperation("subtract", product)} title="Kurangi stok" aria-label={`Kurangi stok ${product.name}`} disabled={product.stock_quantity === 0}>
-                      <MinusCircle size={19} />
+                    <button type="button" className="btn btn-secondary stock-action-btn" onClick={() => openOperation("subtract", product)} aria-label={`Kurangi stok ${product.name}`} disabled={product.stock_quantity === 0}>
+                      Kurang
                     </button>
                   </div>
                 )}
@@ -205,7 +205,7 @@ export function InventoryManager({ products, movements, canManage }: {
             {error && <div className="error" role="alert">{error}</div>}
             <div className="field">
               <label htmlFor="quantity">{operation.type === "add" ? "Jumlah yang ditambahkan" : "Jumlah yang dikurangi"}</label>
-              <input id="quantity" name="quantity" className="input" type="number" inputMode="numeric" min="1" max={operation.type === "subtract" ? operation.product.stock_quantity : undefined} step="1" required autoFocus placeholder="Contoh: 2" />
+              <input id="quantity" name="quantity" className="input" type="number" inputMode="numeric" min="1" max={operation.type === "subtract" ? operation.product.stock_quantity : undefined} step="1" required placeholder="Contoh: 2" />
               {operation.type === "subtract" && <span className="help">Masukkan angka positif. Sistem akan mengurangi stok secara otomatis.</span>}
             </div>
 

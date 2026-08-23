@@ -48,7 +48,7 @@ export interface Sale {
 export interface SaleItem {
   id: string;
   sale_id: string;
-  product_id: string;
+  product_id: string | null;
   product_name_snapshot: string;
   sku_snapshot: string;
   variant_snapshot: string;

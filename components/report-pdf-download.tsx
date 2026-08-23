@@ -26,9 +26,10 @@ export function ReportPdfDownload({ summary }: { summary: ReportSummary }) {
     if (pending) return;
     setPending(true);
     try {
-      const [{ jsPDF }, logo] = await Promise.all([
+      const [{ jsPDF }, logo, dekatLokalLogo] = await Promise.all([
         import("jspdf"),
         imageDataUrl("/logo-eyfa.png").catch(() => null),
+        imageDataUrl("/dekat-lokal.png").catch(() => null),
       ]);
       const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true });
       const pageWidth = doc.internal.pageSize.getWidth();
@@ -76,7 +77,7 @@ export function ReportPdfDownload({ summary }: { summary: ReportSummary }) {
       doc.setFont("helvetica", "bold");
       doc.setFontSize(12);
       doc.setTextColor(24, 67, 42);
-      doc.text("Cerita untuk Owner", margin, y);
+      doc.text("Analisis Periode", margin, y);
       y += 7;
       doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
@@ -110,6 +111,9 @@ export function ReportPdfDownload({ summary }: { summary: ReportSummary }) {
       doc.setFontSize(8);
       doc.text("Dibuat otomatis dari snapshot transaksi selesai. Transaksi batal tidak masuk perhitungan.", margin, 284);
       doc.text(`Dibuat ${new Intl.DateTimeFormat("id-ID", { timeZone: "Asia/Makassar", dateStyle: "medium", timeStyle: "short" }).format(new Date())}`, margin, 289);
+      doc.setFont("helvetica", "normal");
+      doc.text("Powered by", 145, 286);
+      if (dekatLokalLogo) doc.addImage(dekatLokalLogo, "PNG", 164, 281.5, 28, 7, undefined, "FAST");
       doc.save(`eyfa-laporan-${summary.from}-sampai-${summary.to}.pdf`);
       toast({ message: "PDF laporan berhasil dibuat.", tone: "success" });
     } catch (caught) {
@@ -123,7 +127,7 @@ export function ReportPdfDownload({ summary }: { summary: ReportSummary }) {
   return (
     <button type="button" className="btn btn-primary" onClick={download} disabled={pending}>
       {pending ? <LoaderCircle className="motion-safe:animate-spin" size={18} /> : <FileDown size={18} />}
-      {pending ? "Membuat PDF..." : "Unduh PDF Cerita"}
+      {pending ? "Membuat PDF..." : "Unduh PDF"}
     </button>
   );
 }

@@ -31,7 +31,7 @@ export function AppNav() {
     <div className="nav-inner">
       {links.map(({ href, label, icon: Icon }) => {
         const active = pathname === href || pathname.startsWith(`${href}/`);
-        return <Link key={href} href={href} className={`nav-link ${active ? "active" : ""}`} aria-current={active ? "page" : undefined}>
+        return <Link key={href} href={href} prefetch className={`nav-link ${active ? "active" : ""}`} aria-current={active ? "page" : undefined}>
           <NavContent icon={Icon} label={label} />
         </Link>;
       })}

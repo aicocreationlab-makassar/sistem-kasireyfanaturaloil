@@ -36,4 +36,6 @@ Migration kedua, [supabase/migrations/202608230001_performance_and_cash_tender.s
 
 Migration ketiga, [supabase/migrations/202608230002_fix_stock_decrease.sql](supabase/migrations/202608230002_fix_stock_decrease.sql), menambahkan RPC `decrease_stock` yang menerima jumlah positif, mengunci stok produk, mengurangi stok, dan mencatat ledger secara atomik. Migration ini wajib diterapkan agar tombol **Kurangi Stok** memakai alur baru.
 
+Migration keempat, [supabase/migrations/202608230003_safe_product_deletion.sql](supabase/migrations/202608230003_safe_product_deletion.sql), menambahkan penghapusan produk permanen khusus owner. Data katalog dan ledger stok dihapus, sementara snapshot transaksi lama tetap dipertahankan agar laporan historis tidak berubah.
+
 Navigasi operasional memakai loading skeleton per rute dan partial prefetch bawaan Next.js. Data dashboard/kasir diambil paralel; aplikasi sengaja tidak melakukan full prefetch seluruh data transaksi agar database tidak menerima request spekulatif dan data stok tidak menjadi basi.

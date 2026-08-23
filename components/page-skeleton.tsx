@@ -62,7 +62,7 @@ function FormSkeleton() {
 }
 
 export function PageSkeleton({ variant = "list" }: { variant?: SkeletonVariant }) {
-  return <main className="page motion-safe:animate-pulse" aria-busy="true" aria-label="Memuat halaman">
+  return <main className="page page-skeleton" aria-busy="true" aria-label="Memuat halaman">
     <PageHeadSkeleton />
     {variant === "cashier" && <>
       <Block height={94} />

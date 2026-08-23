@@ -156,8 +156,9 @@ export async function getDashboardData() {
   });
   const ranked = new Map<string, { name: string; quantity: number }>();
   for (const item of items) {
-    const entry = ranked.get(item.product_id) ?? { name: item.product_name_snapshot, quantity: 0 };
-    entry.quantity += item.quantity; ranked.set(item.product_id, entry);
+    const productKey = item.product_id ?? `deleted:${item.product_name_snapshot}`;
+    const entry = ranked.get(productKey) ?? { name: item.product_name_snapshot, quantity: 0 };
+    entry.quantity += item.quantity; ranked.set(productKey, entry);
   }
   const best = [...ranked.values()].sort((a, b) => b.quantity - a.quantity)[0] ?? null;
   return {

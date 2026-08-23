@@ -5,6 +5,11 @@ export const metadata: Metadata = {
   title: { default: "EYFA POS", template: "%s · EYFA POS" },
   description: "Kasir, stok, HPP, dan laporan EYFA Natural Oil",
   manifest: "/manifest.webmanifest",
+  icons: {
+    icon: [{ url: "/logo-eyfa.png", type: "image/png" }],
+    shortcut: "/logo-eyfa.png",
+    apple: "/logo-eyfa.png",
+  },
 };
 export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#285b3a" };
 

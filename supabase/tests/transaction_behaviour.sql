@@ -1,7 +1,7 @@
 -- Behavioural database tests. Run after `supabase start` using `supabase test db`.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(28);
+select plan(34);
 
 insert into auth.users(id, email, encrypted_password, email_confirmed_at, aud, role)
 values
@@ -80,6 +80,16 @@ select throws_ok($$
     'cash',null,'66666666-6666-6666-6666-666666666666',50000)
 $$,'P0001',null,'insufficient cash tender is rejected');
 select is((select stock_quantity from public.products where sku='TEST-MURNI-60'),9,'rejected tender rolls back stock changes');
+
+select lives_ok(
+  $$select public.delete_product((select id from public.products where sku='TEST-MURNI-60'))$$,
+  'owner can permanently delete a product'
+);
+select is((select count(*)::integer from public.products where sku='TEST-MURNI-60'),0,'deleted product leaves the catalog');
+select ok((select count(*) from public.sale_items where sku_snapshot='TEST-MURNI-60') > 0,'historical sale item snapshots remain');
+select ok((select bool_and(product_id is null) from public.sale_items where sku_snapshot='TEST-MURNI-60'),'historical sale items release the deleted product reference');
+select lives_ok($$select public.void_sale((select id from public.sales where idempotency_key='55555555-5555-5555-5555-555555555555'),'Void after product deletion')$$,'historical sale remains voidable after product deletion');
+select is((select status::text from public.sales where idempotency_key='55555555-5555-5555-5555-555555555555'),'voided','sale is marked voided when its product no longer exists');
 
 set local request.jwt.claim.sub = '22222222-2222-2222-2222-222222222222';
 select throws_ok($$select public.adjust_stock((select id from public.products where sku='TEST-MURNI-60'),1,'cashier attempt')$$,'42501',null,'cashier cannot adjust stock');

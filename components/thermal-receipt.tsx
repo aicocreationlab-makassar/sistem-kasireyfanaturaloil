@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Globe2, Instagram, Printer } from "lucide-react";
 import { type SVGProps, useState } from "react";
 import { flushSync } from "react-dom";
+import { useToast } from "@/components/toast-provider";
 import { formatDateTime, rupiah } from "@/lib/format";
 import type { PaymentMethod } from "@/lib/types";
 import styles from "./thermal-receipt.module.css";
@@ -46,30 +47,41 @@ function WhatsappIcon(props: SVGProps<SVGSVGElement>) {
 
 export function ThermalReceipt({ sale, items }: { sale: ReceiptData; items: ReceiptLine[] }) {
   const [paper, setPaper] = useState<"58" | "80">("80");
+  const { toast } = useToast();
 
   function printReceipt(size: "58" | "80") {
     flushSync(() => setPaper(size));
-    const printStyle = document.createElement("style");
-    printStyle.id = "eyfa-thermal-page-size";
-    printStyle.textContent = `@page { size: ${size}mm auto; margin: 0 !important; }`;
-    document.getElementById(printStyle.id)?.remove();
-    document.head.appendChild(printStyle);
-    document.body.dataset.thermalPaper = size;
-    document.body.classList.add("receipt-printing");
-    let fallbackTimer = 0;
-    const cleanup = () => {
-      document.body.classList.remove("receipt-printing");
-      delete document.body.dataset.thermalPaper;
-      document.getElementById(printStyle.id)?.remove();
-      window.clearTimeout(fallbackTimer);
-    };
-    window.addEventListener("afterprint", cleanup, { once: true });
-    fallbackTimer = window.setTimeout(cleanup, 60000);
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => {
-        window.print();
-      });
-    });
+    const receipt = document.querySelector<HTMLElement>("[data-thermal-receipt]");
+    const printWindow = window.open("", "_blank", `popup,width=${size === "58" ? 360 : 470},height=720`);
+    if (!receipt || !printWindow) {
+      toast({ message: "Izinkan pop-up browser agar struk dapat dicetak.", tone: "error" });
+      return;
+    }
+
+    const linkedStyles = Array.from(document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]'))
+      .map((link) => `<link rel="stylesheet" href="${link.href}">`)
+      .join("");
+    const inlineStyles = Array.from(document.querySelectorAll<HTMLStyleElement>("style"))
+      .map((style) => style.outerHTML)
+      .join("");
+
+    printWindow.document.open();
+    printWindow.document.write(`<!doctype html><html lang="id"><head><meta charset="utf-8"><base href="${window.location.origin}/"><title>Struk EYFA</title>${linkedStyles}${inlineStyles}<style>
+      @page { size: ${size}mm auto; margin: 0 !important; }
+      * { box-sizing: border-box !important; }
+      html, body { width: ${size}mm !important; min-width: ${size}mm !important; max-width: ${size}mm !important; height: auto !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; overflow: visible !important; background: #fff !important; }
+      [data-thermal-receipt] { display: block !important; position: static !important; width: ${size}mm !important; min-width: ${size}mm !important; max-width: ${size}mm !important; height: auto !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; overflow: visible !important; transform: none !important; zoom: 1 !important; }
+      [data-thermal-receipt] > article { width: ${size}mm !important; min-width: ${size}mm !important; max-width: ${size}mm !important; margin: 0 !important; transform: none !important; }
+    </style></head><body>${receipt.outerHTML}</body></html>`);
+    printWindow.addEventListener("load", async () => {
+      const images = Array.from(printWindow.document.images);
+      await Promise.all(images.map((image) => image.decode?.().catch(() => undefined)));
+      await printWindow.document.fonts?.ready;
+      printWindow.addEventListener("afterprint", () => printWindow.close(), { once: true });
+      printWindow.focus();
+      printWindow.print();
+    }, { once: true });
+    printWindow.document.close();
   }
 
   const paymentLabel = sale.paymentMethod ? paymentLabels[sale.paymentMethod] : "-";
@@ -129,6 +141,7 @@ export function ThermalReceipt({ sale, items }: { sale: ReceiptData; items: Rece
           <strong>Terima kasih sudah berbelanja</strong>
           <div>Simpan struk ini sebagai bukti transaksi.</div>
           <div>Produk alami, dirawat sepenuh hati.</div>
+          <div className={styles.poweredBy}><span>Powered by</span><Image src="/dekat-lokal.png" width={100} height={25} alt="Dekat Lokal" /></div>
         </footer>
       </article>
     </div>

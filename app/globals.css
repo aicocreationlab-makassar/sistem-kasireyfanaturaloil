@@ -42,6 +42,8 @@ h3 { margin-bottom: 5px; font-size: 15px; }
 .brand-sub { margin-top: 4px; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .1em; }
 .user-chip { display: flex; align-items: center; gap: 9px; min-width: 0; }
 .avatar { width: 34px; height: 34px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 50%; background: var(--brand); color: white; font-size: 12px; font-weight: 800; }
+.avatar.user-logo { overflow: hidden; border: 1px solid var(--line); background: white; }
+.avatar.user-logo img { width: 100%; height: 100%; padding: 3px; object-fit: contain; }
 .user-copy { display: none; }
 
 .bottom-nav { position: fixed; z-index: 40; right: 0; bottom: 0; left: 0; height: calc(68px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: rgba(255,255,255,.97); padding-bottom: env(safe-area-inset-bottom); }
@@ -117,6 +119,8 @@ a.card:hover, button.card:hover { border-color: #b9cbbd; box-shadow: 0 11px 30px
 .input-icon .input { padding-left: 40px; }
 .form-grid { display: grid; gap: 15px; }
 .form-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.stock-actions { margin-top: 8px; display: flex; gap: 5px; flex-wrap: nowrap; }
+.stock-action-btn { min-height: 36px; padding: 7px 10px; border-radius: 9px; font-size: 11px; }
 .help { color: var(--muted); font-size: 12px; }
 .error { padding: 11px 13px; border: 1px solid #efcbc8; border-radius: 11px; background: #fff6f5; color: var(--danger); font-size: 13px; }
 .success-box { padding: 14px; border: 1px solid #c7e5d1; border-radius: 12px; background: #f0faf3; color: var(--success); }
@@ -182,6 +186,8 @@ a.card:hover, button.card:hover { border-color: #b9cbbd; box-shadow: 0 11px 30px
 @keyframes page-enter { from { opacity: .65; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes backdrop-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes sheet-in { from { opacity: .75; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes skeleton-reveal { from { opacity: 0; } to { opacity: 1; } }
+.page-skeleton { animation: skeleton-reveal .16s .12s both; }
 
 @media (max-width: 479px) {
   .page { padding-right: 12px; padding-left: 12px; }
@@ -198,6 +204,8 @@ a.card:hover, button.card:hover { border-color: #b9cbbd; box-shadow: 0 11px 30px
   .stock-row { align-items: flex-start; flex-wrap: wrap; }
   .list-item { align-items: flex-start; padding: 13px 12px; }
   .list-value { max-width: 46%; }
+  .stock-actions { flex-direction: column; }
+  .stock-action-btn { width: 64px; }
   .form-actions > .btn { flex: 1 1 132px; }
   .sheet { padding-right: 14px; padding-left: 14px; }
   .sheet-head > div { min-width: 0; }
