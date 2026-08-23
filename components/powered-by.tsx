@@ -1,6 +1,5 @@
 import Image from "next/image";
-
-const DEKAT_LOKAL_URL = "https://www.dekatloka.com";
+import { DEKAT_LOKAL_URL } from "@/lib/contact";
 
 export function PoweredBy({ className = "" }: { className?: string }) {
   return (

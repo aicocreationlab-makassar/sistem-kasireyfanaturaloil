@@ -4,6 +4,18 @@ import { createClient } from "@/lib/supabase/server";
 import { makassarRange, localDateISO } from "@/lib/format";
 import type { Product, Profile, Sale, SaleItem, StockMovement } from "@/lib/types";
 
+interface DashboardSaleItem {
+  sale_id: string;
+  product_id: string | null;
+  product_name_snapshot: string;
+  quantity: number;
+  unit_hpp: number | null;
+  line_cogs: number | null;
+  line_revenue: number;
+  products?: { hpp: number | null } | null;
+  sales: { status: "completed" | "voided"; created_at: string };
+}
+
 export const getSessionContext = cache(async () => {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     redirect("/login?setup=1");
@@ -111,7 +123,7 @@ export async function getDashboardData() {
       .lte("created_at", range.end),
     supabase
       .from("sale_items")
-      .select("product_id,product_name_snapshot,quantity,sales!inner(status,created_at)")
+      .select("sale_id,product_id,product_name_snapshot,quantity,unit_hpp,line_cogs,line_revenue,products(hpp),sales!inner(status,created_at)")
       .eq("sales.status", "completed")
       .gte("sales.created_at", range.start)
       .lte("sales.created_at", range.end),
@@ -132,18 +144,24 @@ export async function getDashboardData() {
   if (recentResult.error) throw recentResult.error;
 
   const sales = salesResult.data ?? [];
-  const items = itemsResult.data ?? [];
+  const items = (itemsResult.data ?? []) as unknown as DashboardSaleItem[];
   const products = productsResult.data ?? [];
   const recent = (recentResult.data ?? []) as unknown as Sale[];
   const todaySales = sales.filter((sale) => localDateISO(new Date(sale.created_at)) === to);
+  const todayItems = items.filter((item) => localDateISO(new Date(item.sales.created_at)) === to);
+  const itemCogs = todayItems.map((item) => {
+    if (item.line_cogs !== null) return Number(item.line_cogs);
+    if (item.unit_hpp !== null) return Number(item.unit_hpp) * item.quantity;
+    if (item.products?.hpp !== null && item.products?.hpp !== undefined) return Number(item.products.hpp) * item.quantity;
+    return null;
+  });
+  const cogsComplete = itemCogs.every((value) => value !== null);
+  const cogs = cogsComplete ? itemCogs.reduce<number>((sum, value) => sum + Number(value), 0) : null;
+  const revenue = todaySales.reduce((sum, sale) => sum + Number(sale.total_amount), 0);
   const summary = {
-    revenue: todaySales.reduce((sum, sale) => sum + Number(sale.total_amount), 0),
-    cogs: todaySales.every((sale) => sale.total_cogs !== null)
-      ? todaySales.reduce((sum, sale) => sum + Number(sale.total_cogs), 0)
-      : null,
-    profit: todaySales.every((sale) => sale.gross_profit !== null)
-      ? todaySales.reduce((sum, sale) => sum + Number(sale.gross_profit), 0)
-      : null,
+    revenue,
+    cogs,
+    profit: cogs === null ? null : revenue - cogs,
     transactions: todaySales.length,
     stock: products.reduce((sum, product) => sum + product.stock_quantity, 0),
   };

@@ -178,7 +178,8 @@
 
 .poweredBy img {
   width: 23mm;
-  height: 6mm;
+  height: auto;
+  aspect-ratio: 528 / 163;
   object-fit: contain;
   filter: grayscale(1) contrast(1.25);
 }

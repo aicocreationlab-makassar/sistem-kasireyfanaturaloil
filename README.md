@@ -38,4 +38,6 @@ Migration ketiga, [supabase/migrations/202608230002_fix_stock_decrease.sql](supa
 
 Migration keempat, [supabase/migrations/202608230003_safe_product_deletion.sql](supabase/migrations/202608230003_safe_product_deletion.sql), menambahkan penghapusan produk permanen khusus owner. Data katalog dan ledger stok dihapus, sementara snapshot transaksi lama tetap dipertahankan agar laporan historis tidak berubah.
 
+Migration kelima, [supabase/migrations/202608230004_backfill_missing_hpp.sql](supabase/migrations/202608230004_backfill_missing_hpp.sql), melengkapi snapshot HPP transaksi lama yang masih kosong dari HPP produk saat ini dan menghitung ulang total HPP serta laba kotornya. Snapshot yang sudah memiliki HPP tidak pernah ditimpa.
+
 Navigasi operasional memakai loading skeleton per rute dan partial prefetch bawaan Next.js. Data dashboard/kasir diambil paralel; aplikasi sengaja tidak melakukan full prefetch seluruh data transaksi agar database tidak menerima request spekulatif dan data stok tidak menjadi basi.

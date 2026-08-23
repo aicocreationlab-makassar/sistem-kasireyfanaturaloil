@@ -4,78 +4,22 @@ import { BarChart3, BookOpenText } from "lucide-react";
 import { CsvDownload } from "@/components/csv-download";
 import { ReportPdfDownload } from "@/components/report-pdf-download";
 import { requireAdmin } from "@/lib/data";
-import { localDateISO, makassarRange, number, rupiah } from "@/lib/format";
+import { number, rupiah } from "@/lib/format";
+import { loadReportRows, resolveReportPeriod, summarizeReportRows } from "@/lib/report-data";
 import { buildReportStory, type ReportSummary } from "@/lib/report-summary";
-import type { ReportRow } from "@/lib/types";
 
 export const metadata = { title: "Laporan" };
-
-function shiftDate(days: number) {
-  return localDateISO(new Date(Date.now() + days * 86400000));
-}
 
 export default async function ReportsPage({ searchParams }: {
   searchParams: Promise<{ from?: string; to?: string; preset?: string }>;
 }) {
   const { supabase } = await requireAdmin();
   const params = await searchParams;
-  const today = localDateISO();
-  let from = params.from || today;
-  let to = params.to || today;
-  const preset = params.preset || "today";
-
-  if (preset === "yesterday") {
-    from = shiftDate(-1);
-    to = from;
-  } else if (preset === "7days") {
-    from = shiftDate(-6);
-    to = today;
-  } else if (preset === "month") {
-    from = `${today.slice(0, 7)}-01`;
-    to = today;
-  }
-  if (from > to) [from, to] = [to, from];
-
-  const range = makassarRange(from, to);
-  const { data, error } = await supabase
-    .from("sale_items")
-    .select("*,sales!inner(transaction_code,created_at,payment_method,status,profiles!sales_cashier_id_fkey(full_name))")
-    .eq("sales.status", "completed")
-    .gte("sales.created_at", range.start)
-    .lte("sales.created_at", range.end)
-    .order("created_at", { ascending: false, referencedTable: "sales" });
-  if (error) throw error;
-
-  const rows = data as unknown as ReportRow[];
-  const revenue = rows.reduce((sum, row) => sum + Number(row.line_revenue), 0);
-  const quantity = rows.reduce((sum, row) => sum + row.quantity, 0);
-  const hppComplete = rows.every((row) => row.line_cogs !== null);
-  const cogs = hppComplete ? rows.reduce((sum, row) => sum + Number(row.line_cogs), 0) : null;
-  const profit = cogs === null ? null : revenue - cogs;
-  const transactions = new Set(rows.map((row) => row.sale_id)).size;
-  const average = transactions ? revenue / transactions : 0;
-
-  const ranked = new Map<string, { name: string; quantity: number; revenue: number }>();
-  for (const row of rows) {
-    const productKey = row.product_id ?? `deleted:${row.sku_snapshot}`;
-    const current = ranked.get(productKey) ?? { name: row.product_name_snapshot, quantity: 0, revenue: 0 };
-    current.quantity += row.quantity;
-    current.revenue += Number(row.line_revenue);
-    ranked.set(productKey, current);
-  }
-  const topProducts = [...ranked.values()].sort((a, b) => b.quantity - a.quantity || b.revenue - a.revenue);
+  const { from, to, preset } = resolveReportPeriod(params);
+  const rows = await loadReportRows(supabase, from, to);
+  const summary: ReportSummary = summarizeReportRows(rows, from, to);
+  const { revenue, quantity, transactions, average, cogs, profit, topProducts } = summary;
   const best = topProducts[0];
-
-  const paymentCounts: Record<string, number> = {};
-  const countedSales = new Set<string>();
-  for (const row of rows) {
-    if (countedSales.has(row.sale_id)) continue;
-    countedSales.add(row.sale_id);
-    const method = row.sales.payment_method ?? "other";
-    paymentCounts[method] = (paymentCounts[method] ?? 0) + 1;
-  }
-
-  const summary: ReportSummary = { from, to, revenue, quantity, transactions, average, cogs, profit, topProducts, paymentCounts };
   const story = buildReportStory(summary);
   const links = [
     { key: "today", label: "Hari Ini" },
@@ -99,7 +43,7 @@ export default async function ReportsPage({ searchParams }: {
       </div>
 
       <div className="filters">
-        {links.map((link) => <Link key={link.key} href={`/reports?preset=${link.key}`} className={`filter ${preset === link.key ? "active" : ""}`}>{link.label}</Link>)}
+        {links.map((link) => <Link key={link.key} href={`/reports?preset=${link.key}`} prefetch className={`filter ${preset === link.key ? "active" : ""}`}>{link.label}</Link>)}
       </div>
 
       <Form className="card card-pad form-grid two section" action="/reports">
