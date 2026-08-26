@@ -137,9 +137,11 @@ a.card:hover, button.card:hover { border-color: #b9cbbd; box-shadow: 0 11px 30px
 .inventory-row { align-items: center; }
 .inventory-main { padding-right: 8px; }
 .inventory-side { flex: 0 0 auto; }
-.inventory-count .list-value { font-size: 22px; }
-.inventory-count .tiny { text-align: right; }
+.inventory-count { display: inline-flex; align-items: baseline; justify-content: flex-end; gap: 5px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.inventory-count span { color: var(--muted); font-size: 11px; }
+.inventory-count strong { font-size: 19px; font-weight: 850; }
 .movement-row { align-items: flex-start; }
+.movement-row .list-value { white-space: nowrap; }
 .help { color: var(--muted); font-size: 12px; }
 .error { padding: 11px 13px; border: 1px solid #efcbc8; border-radius: 11px; background: #fff6f5; color: var(--danger); font-size: 13px; }
 .success-box { padding: 14px; border: 1px solid #c7e5d1; border-radius: 12px; background: #f0faf3; color: var(--success); }
@@ -154,13 +156,13 @@ a.card:hover, button.card:hover { border-color: #b9cbbd; box-shadow: 0 11px 30px
 .empty { padding: 36px 18px; text-align: center; color: var(--muted); }
 .empty svg { width: 38px; height: 38px; margin: 0 auto 12px; color: #a6b0a9; }
 
-.sheet-backdrop, .modal-backdrop { position: fixed; z-index: 70; inset: 0; display: flex; align-items: flex-end; justify-content: center; background: rgba(14,24,18,.52); padding: 0; animation: backdrop-in .16s ease-out both; }
-.sheet { width: min(100%, 560px); max-height: 92dvh; min-width: 0; overflow: auto; overscroll-behavior: contain; border-radius: 22px 22px 0 0; background: white; box-shadow: 0 -12px 42px rgba(0,0,0,.15); padding: 10px 18px calc(20px + env(safe-area-inset-bottom)); animation: sheet-in .2s cubic-bezier(.2,.8,.2,1) both; }
+.sheet-backdrop, .modal-backdrop { position: fixed; z-index: 1000; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(14,24,18,.56); padding: max(16px, env(safe-area-inset-top)) 14px max(16px, env(safe-area-inset-bottom)); animation: backdrop-in .16s ease-out both; }
+.sheet { width: min(100%, 560px); max-height: calc(100dvh - 32px); min-width: 0; overflow-y: auto; overscroll-behavior: contain; border-radius: 22px; background: white; box-shadow: 0 22px 60px rgba(0,0,0,.28); padding: 18px; animation: modal-in .18s cubic-bezier(.2,.8,.2,1) both; }
 .sheet-handle { width: 42px; height: 4px; margin: 0 auto 18px; border-radius: 999px; background: #d4dad6; }
 .sheet-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-.stock-modal-backdrop { position: fixed; z-index: 80; inset: 0; display: grid; place-items: center; padding: max(16px, env(safe-area-inset-top)) 14px max(16px, env(safe-area-inset-bottom)); background: rgba(14,24,18,.55); animation: backdrop-in .16s ease-out both; }
+.stock-modal-backdrop { position: fixed; z-index: 1010; inset: 0; display: grid; place-items: center; padding: max(16px, env(safe-area-inset-top)) 14px max(16px, env(safe-area-inset-bottom)); background: rgba(14,24,18,.58); animation: backdrop-in .16s ease-out both; }
 .stock-modal { width: min(100%, 480px); max-height: calc(100dvh - 32px); min-width: 0; overflow-y: auto; overscroll-behavior: contain; border: 1px solid rgba(255,255,255,.42); border-radius: 20px; background: white; box-shadow: 0 22px 60px rgba(0,0,0,.28); padding: 18px; animation: modal-in .18s cubic-bezier(.2,.8,.2,1) both; }
-.action-modal-backdrop { position: fixed; z-index: 85; inset: 0; display: grid; place-items: center; padding: max(16px, env(safe-area-inset-top)) 14px max(16px, env(safe-area-inset-bottom)); background: rgba(14,24,18,.56); animation: backdrop-in .16s ease-out both; }
+.action-modal-backdrop { position: fixed; z-index: 1010; inset: 0; display: grid; place-items: center; padding: max(16px, env(safe-area-inset-top)) 14px max(16px, env(safe-area-inset-bottom)); background: rgba(14,24,18,.58); animation: backdrop-in .16s ease-out both; }
 .action-modal { width: min(100%, 460px); max-height: calc(100dvh - 32px); overflow-y: auto; overscroll-behavior: contain; padding: 20px; border: 1px solid rgba(255,255,255,.5); border-radius: 20px; background: white; box-shadow: 0 22px 60px rgba(0,0,0,.28); animation: modal-in .18s cubic-bezier(.2,.8,.2,1) both; }
 .action-info { padding: 12px 13px; border: 1px solid #c9ddcf; border-radius: 11px; background: #f1f8f3; color: var(--brand-strong); font-size: 13px; line-height: 1.5; }
 .action-modal-buttons { margin-top: 18px; display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 9px; }
@@ -176,7 +178,7 @@ a.card:hover, button.card:hover { border-color: #b9cbbd; box-shadow: 0 11px 30px
 .cart-controls button { width: 34px; height: 34px; border: 1px solid var(--line); border-radius: 9px; background: white; }
 .cart-controls span { min-width: 22px; text-align: center; font-weight: 800; }
 
-.scanner { position: fixed; z-index: 90; inset: 0; display: flex; flex-direction: column; background: #071009; color: white; }
+.scanner { position: fixed; z-index: 1100; inset: 0; display: flex; flex-direction: column; background: #071009; color: white; }
 .scanner-head { height: 64px; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; }
 .scanner-stage { position: relative; flex: 1; min-height: 0; display: grid; place-items: center; overflow: hidden; }
 .scanner video { width: 100%; height: 100%; object-fit: cover; }
@@ -239,7 +241,7 @@ a.card:hover, button.card:hover { border-color: #b9cbbd; box-shadow: 0 11px 30px
   .inventory-main { padding-right: 0; }
   .inventory-list .list-title { white-space: normal; }
   .inventory-side { width: 100%; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding-top: 10px; border-top: 1px solid #edf0ed; }
-  .inventory-count .list-value, .inventory-count .tiny { text-align: left; }
+  .inventory-count { justify-content: flex-start; }
   .stock-actions { margin-top: 0; flex-direction: row; }
   .stock-action-btn { width: auto; min-width: 76px; }
   .movement-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; }

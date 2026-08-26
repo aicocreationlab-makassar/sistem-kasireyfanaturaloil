@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ArchiveRestore, ArchiveX, Trash2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/toast-provider";
+import { ViewportPortal } from "@/components/viewport-portal";
 import { createClient } from "@/lib/supabase/client";
 
 type Confirmation = "archive" | "restore" | "delete" | null;
@@ -40,13 +41,6 @@ export function ProductArchiveAction({ id, name, imageUrl, active, canDelete }: 
   const [pending, setPending] = useState(false);
   const [confirmation, setConfirmation] = useState<Confirmation>(null);
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    if (!confirmation) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = previousOverflow; };
-  }, [confirmation]);
 
   function closeConfirmation() {
     if (!pending) setConfirmation(null);
@@ -114,7 +108,7 @@ export function ProductArchiveAction({ id, name, imageUrl, active, canDelete }: 
         {canDelete && <button type="button" className="btn btn-danger" onClick={() => { setError(""); setConfirmation("delete"); }} disabled={pending}><Trash2 size={18} /> Hapus</button>}
       </div>
 
-      {confirmation && (
+      {confirmation && <ViewportPortal>
         <div className="action-modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && closeConfirmation()}>
           <section className="action-modal" role="alertdialog" aria-modal="true" aria-labelledby="product-action-title" aria-describedby="product-action-description">
             <div className="sheet-head">
@@ -143,7 +137,7 @@ export function ProductArchiveAction({ id, name, imageUrl, active, canDelete }: 
             </div>
           </section>
         </div>
-      )}
+      </ViewportPortal>}
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { Download, Printer, QrCode, ScanLine, Upload, X } from "lucide-react";
 import { BarcodeScanner } from "@/components/barcode-scanner";
 import { RupiahInput } from "@/components/rupiah-input";
 import { useToast } from "@/components/toast-provider";
+import { ViewportPortal } from "@/components/viewport-portal";
 import { createClient } from "@/lib/supabase/client";
 import type { Product } from "@/lib/types";
 
@@ -63,13 +64,6 @@ export function ProductForm({ product, prefillBarcode = "" }: { product?: Produc
       if (filePreview) URL.revokeObjectURL(filePreview);
     };
   }, [filePreview]);
-
-  useEffect(() => {
-    if (!impactWarningOpen) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = previousOverflow; };
-  }, [impactWarningOpen]);
 
   function selectFile(nextFile: File | null) {
     if (nextFile && nextFile.size > 5 * 1024 * 1024) {
@@ -245,7 +239,7 @@ export function ProductForm({ product, prefillBarcode = "" }: { product?: Produc
         </div>
       </form>
       {scannerOpen && <BarcodeScanner onDetected={detected} onClose={() => setScannerOpen(false)} />}
-      {impactWarningOpen && (
+      {impactWarningOpen && <ViewportPortal>
         <div className="action-modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setImpactWarningOpen(false)}>
           <section className="action-modal" role="alertdialog" aria-modal="true" aria-labelledby="edit-impact-title" aria-describedby="edit-impact-description">
             <div className="sheet-head">
@@ -261,7 +255,7 @@ export function ProductForm({ product, prefillBarcode = "" }: { product?: Produc
             </div>
           </section>
         </div>
-      )}
+      </ViewportPortal>}
     </>
   );
 }

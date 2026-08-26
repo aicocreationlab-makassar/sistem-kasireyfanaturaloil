@@ -5,8 +5,9 @@ import { History, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { RupiahInput } from "@/components/rupiah-input";
 import { useToast } from "@/components/toast-provider";
+import { ViewportPortal } from "@/components/viewport-portal";
 import { createClient } from "@/lib/supabase/client";
-import { formatDateTime, rupiah, stockStatus } from "@/lib/format";
+import { formatDateTime, number, rupiah, stockStatus } from "@/lib/format";
 import type { Product, StockMovement } from "@/lib/types";
 
 type Operation = { type: "add" | "subtract"; product: Product } | null;
@@ -46,17 +47,14 @@ export function InventoryManager({ products, movements, canManage }: {
 
   useEffect(() => {
     if (!operation) return;
-    const previousOverflow = document.body.style.overflow;
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key !== "Escape" || pending) return;
       setError("");
       setUpdateHpp(false);
       setOperation(null);
     };
-    document.body.style.overflow = "hidden";
     window.addEventListener("keydown", closeOnEscape);
     return () => {
-      document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", closeOnEscape);
     };
   }, [operation, pending]);
@@ -166,7 +164,7 @@ export function InventoryManager({ products, movements, canManage }: {
                 <div style={{ marginTop: 7 }}><span className={`badge ${status.tone}`}>{status.label}</span></div>
               </div>
               <div className="inventory-side">
-                <div className="inventory-count"><div className="list-value">{product.stock_quantity}</div><div className="tiny">produk</div></div>
+                <div className="inventory-count"><span>Stok</span><strong>{number(product.stock_quantity)} produk</strong></div>
                 {canManage && (
                   <div className="stock-actions">
                     <button type="button" className="btn btn-secondary stock-action-btn" onClick={() => openOperation("add", product)} aria-label={`Tambah stok ${product.name}`}>
@@ -205,7 +203,7 @@ export function InventoryManager({ products, movements, canManage }: {
         </section>
       )}
 
-      {operation && (
+      {operation && <ViewportPortal>
         <div className="stock-modal-backdrop" onMouseDown={(event) => event.target === event.currentTarget && closeOperation()}>
           <form className="stock-modal form-grid" onSubmit={submit} role="dialog" aria-modal="true" aria-label={operation.type === "add" ? "Tambah stok" : "Kurangi stok"}>
             <div className="sheet-head">
@@ -251,7 +249,7 @@ export function InventoryManager({ products, movements, canManage }: {
             </button>
           </form>
         </div>
-      )}
+      </ViewportPortal>}
     </>
   );
 }

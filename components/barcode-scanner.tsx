@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
+import { ViewportPortal } from "@/components/viewport-portal";
 
 interface BarcodeResult { rawValue: string; format?: string }
 interface Detector { detect(source: HTMLVideoElement): Promise<BarcodeResult[]> }
@@ -56,9 +57,9 @@ export function BarcodeScanner({ onDetected, onClose }: { onDetected: (value: st
     return () => { stopped = true; stopFallback?.(); stream?.getTracks().forEach((track) => track.stop()); };
   }, [onClose, onDetected]);
 
-  return <div className="scanner" role="dialog" aria-modal="true" aria-label="Pemindai barcode">
+  return <ViewportPortal><div className="scanner" role="dialog" aria-modal="true" aria-label="Pemindai barcode">
     <div className="scanner-head"><strong>Scan produk</strong><button className="btn icon-btn" style={{color:"white"}} onClick={onClose} aria-label="Tutup pemindai"><X /></button></div>
     <div className="scanner-stage"><video ref={videoRef} muted playsInline aria-label="Pratinjau kamera" /><div className="scan-frame" />{error && <div className="error" style={{position:"absolute",margin:20}}>{error}</div>}</div>
     <div className="scanner-help">Arahkan barcode atau QR produk ke dalam bingkai. Pemindaian berlangsung otomatis.</div>
-  </div>;
+  </div></ViewportPortal>;
 }
