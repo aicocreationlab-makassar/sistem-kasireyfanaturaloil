@@ -17,6 +17,7 @@ import {
 import { BarcodeScanner } from "@/components/barcode-scanner";
 import { ThermalReceipt, type ReceiptLine } from "@/components/thermal-receipt";
 import { useToast } from "@/components/toast-provider";
+import { ViewportPortal } from "@/components/viewport-portal";
 import { createClient } from "@/lib/supabase/client";
 import { number, parseRupiahInput, rupiah, stockStatus } from "@/lib/format";
 import type { CartItem, PaymentMethod, Product } from "@/lib/types";
@@ -405,7 +406,7 @@ export function CashierPos({
       <ChevronRight size={20} />
     </button>}
 
-    {success && <div className="sheet-backdrop">
+    {success && <ViewportPortal><div className="sheet-backdrop">
       <section className="sheet" role="alertdialog" aria-modal="true" aria-label="Transaksi berhasil">
         <div className="sheet-handle" />
         <div className={styles.successSummary}>
@@ -433,7 +434,7 @@ export function CashierPos({
           <Link className="btn btn-secondary btn-wide" href={`/sales/${success.id}`} prefetch>Lihat Detail Transaksi</Link>
         </div>
       </section>
-    </div>}
+    </div></ViewportPortal>}
 
     {scannerOpen && <BarcodeScanner onDetected={detected} onClose={() => setScannerOpen(false)} />}
   </>;
