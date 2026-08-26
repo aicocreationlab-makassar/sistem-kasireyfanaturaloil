@@ -122,10 +122,24 @@ a.card:hover, button.card:hover { border-color: #b9cbbd; box-shadow: 0 11px 30px
 .input-icon { position: relative; }
 .input-icon svg { position: absolute; top: 13px; left: 12px; width: 19px; color: var(--muted); }
 .input-icon .input { padding-left: 40px; }
+.label-with-hint { display: flex; align-items: center; gap: 6px; }
+.password-hint { position: relative; display: inline-grid; place-items: center; color: var(--muted); cursor: help; outline: none; }
+.password-hint:focus { color: var(--brand); }
+.hint-popover { position: absolute; z-index: 12; bottom: calc(100% + 8px); left: -10px; width: min(250px, calc(100vw - 48px)); padding: 9px 10px; border-radius: 9px; background: #17211b; color: white; box-shadow: var(--shadow); font-size: 11px; font-weight: 600; line-height: 1.4; opacity: 0; visibility: hidden; transform: translateY(4px); transition: opacity .14s ease, transform .14s ease, visibility .14s; pointer-events: none; }
+.password-hint:hover .hint-popover, .password-hint:focus .hint-popover { opacity: 1; visibility: visible; transform: translateY(0); }
+.password-input { position: relative; }
+.password-input > svg { position: absolute; z-index: 1; top: 14px; left: 12px; color: var(--muted); pointer-events: none; }
+.password-input .input { padding-left: 40px; }
 .form-grid { display: grid; gap: 15px; }
 .form-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 .stock-actions { margin-top: 8px; display: flex; gap: 5px; flex-wrap: nowrap; }
 .stock-action-btn { min-height: 36px; padding: 7px 10px; border-radius: 9px; font-size: 11px; }
+.inventory-row { align-items: center; }
+.inventory-main { padding-right: 8px; }
+.inventory-side { flex: 0 0 auto; }
+.inventory-count .list-value { font-size: 22px; }
+.inventory-count .tiny { text-align: right; }
+.movement-row { align-items: flex-start; }
 .help { color: var(--muted); font-size: 12px; }
 .error { padding: 11px 13px; border: 1px solid #efcbc8; border-radius: 11px; background: #fff6f5; color: var(--danger); font-size: 13px; }
 .success-box { padding: 14px; border: 1px solid #c7e5d1; border-radius: 12px; background: #f0faf3; color: var(--success); }
@@ -145,7 +159,11 @@ a.card:hover, button.card:hover { border-color: #b9cbbd; box-shadow: 0 11px 30px
 .sheet-handle { width: 42px; height: 4px; margin: 0 auto 18px; border-radius: 999px; background: #d4dad6; }
 .sheet-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .stock-modal-backdrop { position: fixed; z-index: 80; inset: 0; display: grid; place-items: center; padding: max(16px, env(safe-area-inset-top)) 14px max(16px, env(safe-area-inset-bottom)); background: rgba(14,24,18,.55); animation: backdrop-in .16s ease-out both; }
-.stock-modal { width: min(100%, 520px); max-height: min(88dvh, 720px); min-width: 0; overflow: auto; overscroll-behavior: contain; border: 1px solid rgba(255,255,255,.42); border-radius: 20px; background: white; box-shadow: 0 22px 60px rgba(0,0,0,.28); padding: 18px; animation: modal-in .18s cubic-bezier(.2,.8,.2,1) both; }
+.stock-modal { width: min(100%, 480px); max-height: calc(100dvh - 32px); min-width: 0; overflow-y: auto; overscroll-behavior: contain; border: 1px solid rgba(255,255,255,.42); border-radius: 20px; background: white; box-shadow: 0 22px 60px rgba(0,0,0,.28); padding: 18px; animation: modal-in .18s cubic-bezier(.2,.8,.2,1) both; }
+.action-modal-backdrop { position: fixed; z-index: 85; inset: 0; display: grid; place-items: center; padding: max(16px, env(safe-area-inset-top)) 14px max(16px, env(safe-area-inset-bottom)); background: rgba(14,24,18,.56); animation: backdrop-in .16s ease-out both; }
+.action-modal { width: min(100%, 460px); max-height: calc(100dvh - 32px); overflow-y: auto; overscroll-behavior: contain; padding: 20px; border: 1px solid rgba(255,255,255,.5); border-radius: 20px; background: white; box-shadow: 0 22px 60px rgba(0,0,0,.28); animation: modal-in .18s cubic-bezier(.2,.8,.2,1) both; }
+.action-info { padding: 12px 13px; border: 1px solid #c9ddcf; border-radius: 11px; background: #f1f8f3; color: var(--brand-strong); font-size: 13px; line-height: 1.5; }
+.action-modal-buttons { margin-top: 18px; display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 9px; }
 .quantity { margin: 22px 0; display: flex; align-items: center; justify-content: center; gap: 24px; }
 .quantity button { width: 48px; height: 48px; border: 1px solid var(--line); border-radius: 14px; background: white; color: var(--brand); font-size: 24px; cursor: pointer; }
 .quantity strong { min-width: 45px; text-align: center; font-size: 28px; }
@@ -217,8 +235,15 @@ a.card:hover, button.card:hover { border-color: #b9cbbd; box-shadow: 0 11px 30px
   .stock-row { align-items: flex-start; flex-wrap: wrap; }
   .list-item { align-items: flex-start; padding: 13px 12px; }
   .list-value { max-width: 46%; }
-  .stock-actions { flex-direction: column; }
-  .stock-action-btn { width: 64px; }
+  .inventory-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .inventory-main { padding-right: 0; }
+  .inventory-list .list-title { white-space: normal; }
+  .inventory-side { width: 100%; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding-top: 10px; border-top: 1px solid #edf0ed; }
+  .inventory-count .list-value, .inventory-count .tiny { text-align: left; }
+  .stock-actions { margin-top: 0; flex-direction: row; }
+  .stock-action-btn { width: auto; min-width: 76px; }
+  .movement-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; }
+  .movement-row .list-value { max-width: 100%; }
   .form-actions > .btn { flex: 1 1 132px; }
   .report-range-form { grid-template-columns: minmax(0, 1fr); gap: 12px; }
   .report-range-form .btn { width: 100%; }

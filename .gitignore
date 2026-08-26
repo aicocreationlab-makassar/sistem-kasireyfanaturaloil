@@ -7,3 +7,6 @@ out/
 coverage/
 *.tsbuildinfo
 .DS_Store
+
+# One-time local credential script; never commit plaintext login secrets.
+supabase/manual/change_owner_login.sql

@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LoaderCircle, LogIn } from "lucide-react";
+import { CircleHelp, KeyRound, LoaderCircle, LogIn } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 export function LoginForm({ configured, nextPath = "/cashier" }: { configured: boolean; nextPath?: string }) {
@@ -21,8 +21,11 @@ export function LoginForm({ configured, nextPath = "/cashier" }: { configured: b
   if (!configured) return <div className="error">Supabase belum dikonfigurasi. Isi variabel pada <strong>.env.local</strong>, jalankan migration dan seed, lalu muat ulang halaman.</div>;
   return <form className="auth-form form-grid" onSubmit={submit}>
     {error && <div className="error" role="alert">{error}</div>}
-    <div className="field"><label htmlFor="email">Email</label><input id="email" className="input" type="email" autoComplete="email" inputMode="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="owner@eyfa.id" /></div>
-    <div className="field"><label htmlFor="password">Kata sandi</label><input id="password" className="input" type="password" autoComplete="current-password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" /></div>
+    <div className="field"><label htmlFor="email">Email</label><input id="email" className="input" type="email" autoComplete="email" inputMode="email" autoCapitalize="none" spellCheck={false} required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Masukkan email" /></div>
+    <div className="field">
+      <label htmlFor="password" className="label-with-hint">Kata sandi <span className="password-hint" tabIndex={0} aria-label="Petunjuk kata sandi"><CircleHelp size={16} aria-hidden="true" /><span className="hint-popover" role="tooltip">Gunakan kata sandi akun yang terdaftar. Huruf besar dan kecil dibedakan.</span></span></label>
+      <div className="password-input"><KeyRound size={18} aria-hidden="true" /><input id="password" className="input" type="password" autoComplete="current-password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Masukkan kata sandi" /></div>
+    </div>
     <button className="btn btn-primary btn-wide btn-lg" disabled={pending}>{pending ? <LoaderCircle className="animate-spin" size={19} /> : <LogIn size={19} />} {pending ? "Memeriksa..." : "Masuk"}</button>
     <Link href="/forgot-password" className="btn btn-ghost">Lupa kata sandi?</Link>
   </form>;
@@ -38,7 +41,7 @@ export function ForgotForm({ configured }: { configured: boolean }) {
   if (!configured) return <div className="error">Supabase belum dikonfigurasi.</div>;
   return <form className="auth-form form-grid" onSubmit={submit}>
     {message && <div className={message.startsWith("Tautan") ? "success-box" : "error"}>{message}</div>}
-    <div className="field"><label htmlFor="email">Email akun</label><input id="email" className="input" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} /></div>
+    <div className="field"><label htmlFor="email">Email akun</label><input id="email" className="input" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Masukkan email" /></div>
     <button className="btn btn-primary btn-wide" disabled={pending}>{pending ? "Mengirim..." : "Kirim tautan pemulihan"}</button>
     <Link href="/login" className="btn btn-ghost">Kembali ke login</Link>
   </form>;
