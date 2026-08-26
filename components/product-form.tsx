@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { type FormEvent, useCallback, useEffect, useState } from "react";
+import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Download, Printer, QrCode, ScanLine, Upload, X } from "lucide-react";
 import { BarcodeScanner } from "@/components/barcode-scanner";
@@ -54,12 +54,22 @@ export function ProductForm({ product, prefillBarcode = "" }: { product?: Produc
   const [generatingQr, setGeneratingQr] = useState(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+  const [impactWarningOpen, setImpactWarningOpen] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+  const impactConfirmed = useRef(false);
 
   useEffect(() => {
     return () => {
       if (filePreview) URL.revokeObjectURL(filePreview);
     };
   }, [filePreview]);
+
+  useEffect(() => {
+    if (!impactWarningOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = previousOverflow; };
+  }, [impactWarningOpen]);
 
   function selectFile(nextFile: File | null) {
     if (nextFile && nextFile.size > 5 * 1024 * 1024) {
@@ -92,10 +102,21 @@ export function ProductForm({ product, prefillBarcode = "" }: { product?: Produc
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (pending) return;
+    const form = new FormData(event.currentTarget);
+    const hppText = String(form.get("hpp") ?? "").trim();
+    const nextHpp = hppText ? Number(hppText) : null;
+    const changesFinancialCalculation = product && (
+      Number(form.get("selling_price")) !== Number(product.selling_price)
+      || nextHpp !== (product.hpp === null ? null : Number(product.hpp))
+    );
+    if (changesFinancialCalculation && !impactConfirmed.current) {
+      setImpactWarningOpen(true);
+      return;
+    }
+
+    impactConfirmed.current = false;
     setPending(true);
     setError("");
-
-    const form = new FormData(event.currentTarget);
     try {
       let finalImage = imageUrl;
       const supabase = createClient();
@@ -110,14 +131,13 @@ export function ProductForm({ product, prefillBarcode = "" }: { product?: Produc
         finalImage = supabase.storage.from("product-images").getPublicUrl(path).data.publicUrl;
       }
 
-      const hppText = String(form.get("hpp") ?? "").trim();
       const shared = {
         p_name: String(form.get("name")).trim(),
         p_variant: String(form.get("variant")),
         p_size_ml: Number(form.get("size_ml")),
         p_sku: String(form.get("sku")).trim(),
         p_selling_price: Number(form.get("selling_price")),
-        p_hpp: hppText ? Number(hppText) : null,
+        p_hpp: nextHpp,
         p_low_stock_threshold: Number(form.get("low_stock_threshold")),
         p_image_url: finalImage,
         p_barcode_value: barcode.trim() || null,
@@ -137,6 +157,12 @@ export function ProductForm({ product, prefillBarcode = "" }: { product?: Produc
     } finally {
       setPending(false);
     }
+  }
+
+  function confirmFinancialEdit() {
+    impactConfirmed.current = true;
+    setImpactWarningOpen(false);
+    window.requestAnimationFrame(() => formRef.current?.requestSubmit());
   }
 
   const detected = useCallback((value: string, format: string) => {
@@ -167,7 +193,7 @@ export function ProductForm({ product, prefillBarcode = "" }: { product?: Produc
 
   return (
     <>
-      <form className="card card-pad form-grid" onSubmit={submit} style={{ minWidth: 0 }}>
+      <form ref={formRef} className="card card-pad form-grid" onSubmit={submit} style={{ minWidth: 0 }}>
         {error && <div className="error" role="alert" style={{ overflowWrap: "anywhere" }}>{error}</div>}
         <div className="form-grid two">
           <div className="field"><label htmlFor="name">Nama Produk</label><input id="name" name="name" className="input" required defaultValue={product?.name} placeholder="Minyak Kemiri Murni 60 ml" /></div>
@@ -219,6 +245,23 @@ export function ProductForm({ product, prefillBarcode = "" }: { product?: Produc
         </div>
       </form>
       {scannerOpen && <BarcodeScanner onDetected={detected} onClose={() => setScannerOpen(false)} />}
+      {impactWarningOpen && (
+        <div className="action-modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setImpactWarningOpen(false)}>
+          <section className="action-modal" role="alertdialog" aria-modal="true" aria-labelledby="edit-impact-title" aria-describedby="edit-impact-description">
+            <div className="sheet-head">
+              <div><p className="eyebrow">Dampak perhitungan</p><h2 id="edit-impact-title">Simpan perubahan harga/HPP?</h2></div>
+              <button type="button" className="btn icon-btn" onClick={() => setImpactWarningOpen(false)} aria-label="Tutup"><X /></button>
+            </div>
+            <div id="edit-impact-description" className="action-info">
+              Harga jual atau HPP berubah. Transaksi dan laporan lama tetap memakai nilai snapshot sebelumnya. Transaksi berikutnya akan memakai nilai baru untuk omzet, HPP, dan laba.
+            </div>
+            <div className="action-modal-buttons">
+              <button type="button" className="btn btn-secondary" onClick={() => setImpactWarningOpen(false)}>Periksa Lagi</button>
+              <button type="button" className="btn btn-primary" onClick={confirmFinancialEdit}>Tetap Simpan</button>
+            </div>
+          </section>
+        </div>
+      )}
     </>
   );
 }

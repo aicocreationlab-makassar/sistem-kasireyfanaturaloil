@@ -153,21 +153,20 @@ export function InventoryManager({ products, movements, canManage }: {
 
   return (
     <>
-      <div className="card list">
+      <div className="card list inventory-list">
         {products.map((product) => {
           const status = stockStatus(product.stock_quantity, product.low_stock_threshold);
           return (
-            <div className="list-item" key={product.id} style={{ alignItems: "flex-start" }}>
-              <div className="list-main">
+            <div className="list-item inventory-row" key={product.id}>
+              <div className="list-main inventory-main">
                 <div className="list-title">{product.name}</div>
                 <div className="list-meta">
                   Batas minimum {product.low_stock_threshold} · {product.hpp === null ? "HPP belum diatur" : `HPP ${rupiah(product.hpp)}`}
                 </div>
                 <div style={{ marginTop: 7 }}><span className={`badge ${status.tone}`}>{status.label}</span></div>
               </div>
-              <div style={{ flex: "0 0 auto" }}>
-                <div className="list-value" style={{ fontSize: 22 }}>{product.stock_quantity}</div>
-                <div className="tiny" style={{ textAlign: "right" }}>produk</div>
+              <div className="inventory-side">
+                <div className="inventory-count"><div className="list-value">{product.stock_quantity}</div><div className="tiny">produk</div></div>
                 {canManage && (
                   <div className="stock-actions">
                     <button type="button" className="btn btn-secondary stock-action-btn" onClick={() => openOperation("add", product)} aria-label={`Tambah stok ${product.name}`}>
@@ -189,7 +188,7 @@ export function InventoryManager({ products, movements, canManage }: {
           <div className="section-head"><h2>Riwayat Pergerakan</h2><span className="tiny">50 terbaru</span></div>
           <div className="card list">
             {movements.map((movement) => (
-              <div className="list-item" key={movement.id} style={{ alignItems: "flex-start" }}>
+              <div className="list-item movement-row" key={movement.id}>
                 <div className="list-main">
                   <div className="list-title">{movement.products?.name}</div>
                   <div className="list-meta">{movementLabels[movement.movement_type]} · {formatDateTime(movement.created_at)}</div>
@@ -221,7 +220,7 @@ export function InventoryManager({ products, movements, canManage }: {
             {error && <div className="error" role="alert">{error}</div>}
             <div className="field">
               <label htmlFor="quantity">{operation.type === "add" ? "Jumlah yang ditambahkan" : "Jumlah yang dikurangi"}</label>
-              <input id="quantity" name="quantity" className="input" type="number" inputMode="numeric" min="1" max={operation.type === "subtract" ? operation.product.stock_quantity : undefined} step="1" required placeholder="Contoh: 2" autoFocus />
+              <input id="quantity" name="quantity" className="input" type="number" inputMode="numeric" min="1" max={operation.type === "subtract" ? operation.product.stock_quantity : undefined} step="1" required placeholder="Contoh: 2" />
               {operation.type === "subtract" && <span className="help">Masukkan angka positif. Sistem akan mengurangi stok secara otomatis.</span>}
             </div>
 
